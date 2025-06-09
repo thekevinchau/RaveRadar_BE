@@ -1,6 +1,7 @@
 package com.project.RaveRadar.controllers;
 
 import com.project.RaveRadar.models.User;
+import com.project.RaveRadar.payloads.UserRegPayload;
 import com.project.RaveRadar.services.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +23,7 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody User user){
-        return userService.register(user);
+    public ResponseEntity<String> register(@RequestBody UserRegPayload payload){
+        return userService.register(payload);
     }
 }

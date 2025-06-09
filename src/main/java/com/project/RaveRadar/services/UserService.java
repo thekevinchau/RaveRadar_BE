@@ -1,6 +1,7 @@
 package com.project.RaveRadar.services;
 
 import com.project.RaveRadar.models.User;
+import com.project.RaveRadar.payloads.UserRegPayload;
 import com.project.RaveRadar.repositories.UserRepository;
 import com.project.RaveRadar.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,20 +24,25 @@ public class UserService {
     private JwtUtil jwtUtil;;
 
     private final UserRepository userRepository;
+    private final UserProfileService userProfileService;
 
-
-    public UserService(PasswordEncoder passwordEncoder, AuthenticationManager manager, UserRepository userRepository) {
+    public UserService(PasswordEncoder passwordEncoder, AuthenticationManager manager, UserRepository userRepository, UserProfileService userProfileService) {
         this.passwordEncoder = passwordEncoder;
         this.manager = manager;
         this.userRepository = userRepository;
+        this.userProfileService = userProfileService;
     }
 
-    public ResponseEntity<String> register(User user){
-        Optional<User> userOptional = userRepository.findByEmail(user.getEmail());
+    public ResponseEntity<String> register(UserRegPayload payload){
+        Optional<User> userOptional = userRepository.findByEmail(payload.getEmail());
         if (userOptional.isEmpty()){
-            String currentPassword = user.getPassword();
-            user.setPassword(passwordEncoder.encode(currentPassword));
-            userRepository.save(user);
+            User newUser = new User();
+            newUser.setEmail(payload.getEmail());
+            String currentPassword = payload.getPassword();
+            newUser.setPassword(passwordEncoder.encode(currentPassword));
+            newUser.setRole("ROLE_USER");
+            User savedUser = userRepository.save(newUser);
+            userProfileService.createUserProfile(savedUser, payload.getUsername());
             return ResponseEntity.ok("Success");
         }
         return ResponseEntity.ok("user already exists!");

@@ -1,9 +1,11 @@
 package com.project.RaveRadar.services;
 
+import com.project.RaveRadar.exceptions.NotFoundException;
 import com.project.RaveRadar.models.User;
 import com.project.RaveRadar.payloads.UserRegPayload;
 import com.project.RaveRadar.repositories.UserRepository;
 import com.project.RaveRadar.security.JwtUtil;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,7 +23,7 @@ public class UserService {
     private final AuthenticationManager manager;
 
     @Autowired
-    private JwtUtil jwtUtil;;
+    private JwtUtil jwtUtil;
 
     private final UserRepository userRepository;
     private final UserProfileService userProfileService;
@@ -33,6 +35,7 @@ public class UserService {
         this.userProfileService = userProfileService;
     }
 
+    @Transactional
     public ResponseEntity<String> register(UserRegPayload payload){
         Optional<User> userOptional = userRepository.findByEmail(payload.getEmail());
         if (userOptional.isEmpty()){

@@ -74,6 +74,4 @@ public class EventService {
         - artist attendance
         - is it a festival?
      */
-
-
 }

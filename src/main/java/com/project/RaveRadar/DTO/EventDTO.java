@@ -1,4 +1,7 @@
 package com.project.RaveRadar.DTO;
+import com.project.RaveRadar.enums.AgeRestriction;
+import com.project.RaveRadar.enums.EdmGenre;
+import com.project.RaveRadar.enums.EventType;
 import com.project.RaveRadar.models.Event;
 import lombok.Data;
 
@@ -14,12 +17,12 @@ public class EventDTO {
     private ZonedDateTime startDate;
     private ZonedDateTime endDate;
     private AddressDTO address;
-    private String eventType;
-    private String genre;
+    private EventType eventType;
+    private EdmGenre genre;
     private String externalLink;
     private String imagePath;
     private String supportEmail;
-    private String ageRestriction;
+    private AgeRestriction ageRestriction;
     private ZonedDateTime createdAt;
     private ZonedDateTime updatedAt;
 

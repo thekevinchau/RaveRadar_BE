@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/events")
 @AllArgsConstructor
@@ -19,11 +21,21 @@ public class EventController {
     private final EventService eventService;
 
     @GetMapping("/all-events")
-    public ResponseEntity<PagedModel<EventDTO>> getAllEventsByDateAscending(
+    public ResponseEntity<List<EventDTO>> getAllEventsByDateAscending(
             @RequestParam int page,
             @RequestParam int size
     ){
-        Pageable pageable = PageRequest.of(page, size);
-        return eventService.getAllEventsAscending(pageable);
+        return eventService.getAllEventsAscending(page, size);
+    }
+
+    @GetMapping("")
+    public ResponseEntity<List<EventDTO>> getAllEventsByLocation (
+            @RequestParam int page,
+            @RequestParam int size,
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) String state,
+            @RequestParam(required = false) String type
+    ){
+        return eventService.getAllEventsByCriteria(page, size, city, state, type);
     }
 }

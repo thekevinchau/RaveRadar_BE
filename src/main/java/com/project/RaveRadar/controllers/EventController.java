@@ -29,7 +29,7 @@ public class EventController {
     }
 
     @GetMapping("")
-    public ResponseEntity<List<EventDTO>> getAllEventsByLocation (
+    public ResponseEntity<List<EventDTO>> getAllEventsByQuery (
             @RequestParam int page,
             @RequestParam int size,
             @RequestParam(required = false) String city,
@@ -38,4 +38,6 @@ public class EventController {
     ){
         return eventService.getAllEventsByCriteria(page, size, city, state, type);
     }
+
+
 }

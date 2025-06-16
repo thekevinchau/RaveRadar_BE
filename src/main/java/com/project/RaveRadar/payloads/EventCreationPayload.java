@@ -1,9 +1,9 @@
 package com.project.RaveRadar.payloads;
 
+import com.project.RaveRadar.enums.AgeRestriction;
 import com.project.RaveRadar.enums.EdmGenre;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
+import com.project.RaveRadar.enums.EventType;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,21 +14,33 @@ import java.time.ZonedDateTime;
 @NoArgsConstructor
 public class EventCreationPayload {
 
-
-    @NotNull @NotBlank @NotEmpty
+    @NotBlank(message = "Event name is required")
     private String eventName;
-    @NotNull @NotBlank @NotEmpty
+
+    @NotBlank(message = "Description is required")
     private String description;
-    @NotNull @NotBlank @NotEmpty
-    private String eventType;
-    @NotNull @NotBlank @NotEmpty
+
+    @NotNull(message = "Event type is required")
+    private EventType eventType;
+
+    @NotNull(message = "Genre is required")
     private EdmGenre genre;
-    @NotNull @NotBlank @NotEmpty
+
+    @NotBlank(message = "External link is required")
+    @Pattern(
+            regexp = "^(https?://)?[\\w.-]+(?:\\.[\\w\\.-]+)+[/#?]?.*$",
+            message = "Invalid URL format"
+    )
     private String externalLink;
-    @NotNull @NotBlank @NotEmpty
-    private String ageRestriction;
-    @NotNull @NotBlank @NotEmpty
+
+    @NotNull(message = "Age restriction is required")
+    private AgeRestriction ageRestriction;
+
+    @NotNull(message = "Start date is required")
+    @Future(message = "Start date must be in the future")
     private ZonedDateTime startDate;
-    @NotNull @NotBlank @NotEmpty
+
+    @NotNull(message = "End date is required")
+    @Future(message = "End date must be in the future")
     private ZonedDateTime endDate;
 }

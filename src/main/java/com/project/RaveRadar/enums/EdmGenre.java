@@ -11,6 +11,7 @@ public enum EdmGenre {
     TRANCE("Trance"),
     DUBSTEP("Dubstep"),
     DRUM_AND_BASS("Drum and Bass"),
+    BASS("BASS"),
     FUTURE_BASS("Future Bass"),
     PROGRESSIVE_HOUSE("Progressive House"),
     ELECTRO_HOUSE("Electro House"),
@@ -27,7 +28,8 @@ public enum EdmGenre {
     BASS_HOUSE("Bass House"),
     MELODIC_BASS("Melodic Bass"),
     MELODIC_TECHNO("Melodic Techno"),
-    MIDTEMPO("MIDTEMPO"),
+    MIDTEMPO("Midtempo"),
+    VARIOUS("Various"),
     AMBIENT("Ambient");
 
 

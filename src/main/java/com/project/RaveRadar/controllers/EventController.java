@@ -1,8 +1,10 @@
 package com.project.RaveRadar.controllers;
 
 import com.project.RaveRadar.DTO.EventDTO;
+import com.project.RaveRadar.enums.EdmGenre;
 import com.project.RaveRadar.enums.EventType;
 import com.project.RaveRadar.models.Event;
+import com.project.RaveRadar.payloads.EventFilters;
 import com.project.RaveRadar.services.EventService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -35,16 +37,11 @@ public class EventController {
         return eventService.getAllEventsAscending(page, size);
     }
 
-    @GetMapping("")
+    @PostMapping("")
     public ResponseEntity<List<EventDTO>> getAllEventsByQuery (
-            @RequestParam int page,
-            @RequestParam int size,
-            @RequestParam(required = false) String city,
-            @RequestParam(required = false) String state,
-            @RequestParam(required = false) EventType type,
-            @RequestParam( required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate eventDate
+            @RequestBody EventFilters filters
             ){
-        return eventService.getAllEventsByCriteria(page, size, city, state, type, eventDate);
+        return eventService.getAllEventsByCriteria(filters);
     }
 
 

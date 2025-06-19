@@ -1,6 +1,7 @@
 package com.project.RaveRadar.services;
 
 import com.project.RaveRadar.DTO.EventDTO;
+import com.project.RaveRadar.enums.EventType;
 import com.project.RaveRadar.exceptions.NotFoundException;
 import com.project.RaveRadar.models.Event;
 import com.project.RaveRadar.repositories.EventRepository;
@@ -15,6 +16,10 @@ import org.springframework.data.web.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -41,7 +46,7 @@ public class EventService {
         return ResponseEntity.ok(eventsDTOs);
     }
 
-    public ResponseEntity<List<EventDTO>> getAllEventsByCriteria(int pageNo, int pageSize, String city, String state, String eventType){
+    public ResponseEntity<List<EventDTO>> getAllEventsByCriteria(int pageNo, int pageSize, String city, String state, EventType eventType, LocalDate date){
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.ASC, "startDate"));
         Specification<Event> spec = (root, query, cb) -> cb.conjunction();
 
@@ -50,8 +55,12 @@ public class EventService {
                 spec = spec.and(EventSpecification.hasLocation(state, city));
             }
         }
-        if (eventType != null && !eventType.isEmpty()){
+        if (eventType != null){
             spec = spec.and(EventSpecification.hasEventType(eventType));
+        }
+
+        if (date != null){
+            spec = spec.and(EventSpecification.hasEventDate(date));
         }
 
 

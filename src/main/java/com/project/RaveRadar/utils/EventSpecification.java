@@ -50,7 +50,7 @@ public class EventSpecification {
     public static Specification<Event> hasGenre(List<EdmGenre> genres){
         return (root, query, criteriaBuilder) -> {
             if (genres == null || genres.isEmpty()) return null;
-            return root.get("eventType").in(genres);
+            return root.get("genre").in(genres);
         };
     }
 

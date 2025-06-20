@@ -48,6 +48,10 @@ public class EventService {
     }
 
     public ResponseEntity<List<EventDTO>> getAllEventsByCriteria(EventFilters filters){
+        System.out.println("Event locations: " + filters.getLocations());
+        System.out.println("Event date: " + filters.getEventDate());
+        System.out.println("Event types: " + filters.getEventTypes());
+        System.out.println("Genres: " + filters.getGenres());
         String sortBy = filters.getSortBy();
         Pageable pageable = PageRequest.of(filters.getPageNo(), filters.getPageSize(), Sort.by(sortBy.equals("DESC") ? Sort.Direction.DESC : Sort.Direction.ASC, "startDate"));
         Specification<Event> spec = (root, query, cb) -> cb.conjunction();
@@ -58,6 +62,14 @@ public class EventService {
 
         if (filters.getEventTypes() != null && !filters.getEventTypes().isEmpty()){
             spec = spec.and(EventSpecification.hasEventType(filters.getEventTypes()));
+        }
+
+        if (filters.getEventDate() != null){
+            spec = spec.and(EventSpecification.hasEventDate(filters.getEventDate()));
+        }
+
+        if (filters.getGenres() != null && !filters.getGenres().isEmpty()){
+            spec = spec.and(EventSpecification.hasGenre(filters.getGenres()));
         }
 
             /*

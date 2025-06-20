@@ -46,11 +46,13 @@ public enum EdmGenre {
 
 
     @JsonCreator
-    public static EdmGenre fromLabel(String label) {
-        return Stream.of(EdmGenre.values())
-                .filter(e -> e.label.equalsIgnoreCase(label))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Invalid genre: " + label));
+    public static EdmGenre fromLabel(String input) {
+        for (EdmGenre value : EdmGenre.values()) {
+            if (value.label.equalsIgnoreCase(input.trim())) {
+                return value;
+            }
+        }
+        throw new IllegalArgumentException("Invalid Genre Type: " + input);
     }
 
     @JsonValue

@@ -38,6 +38,6 @@ public enum EventType {
                 return value;
             }
         }
-        throw new IllegalArgumentException("Invalid age restriction: " + input);
+        throw new IllegalArgumentException("Invalid Event Type: " + input);
     }
 }

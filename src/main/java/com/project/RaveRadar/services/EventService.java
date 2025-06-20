@@ -4,6 +4,7 @@ import com.project.RaveRadar.DTO.EventDTO;
 import com.project.RaveRadar.enums.EventType;
 import com.project.RaveRadar.exceptions.NotFoundException;
 import com.project.RaveRadar.models.Event;
+import com.project.RaveRadar.payloads.EventFilters;
 import com.project.RaveRadar.repositories.EventRepository;
 import com.project.RaveRadar.utils.EventSpecification;
 import lombok.AllArgsConstructor;
@@ -46,15 +47,39 @@ public class EventService {
         return ResponseEntity.ok(eventsDTOs);
     }
 
-    public ResponseEntity<List<EventDTO>> getAllEventsByCriteria(int pageNo, int pageSize, String city, String state, EventType eventType, LocalDate date){
-        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.ASC, "startDate"));
+    public ResponseEntity<List<EventDTO>> getAllEventsByCriteria(EventFilters filters){
+        System.out.println("Event locations: " + filters.getLocations());
+        System.out.println("Event date: " + filters.getEventDate());
+        System.out.println("Event types: " + filters.getEventTypes());
+        System.out.println("Genres: " + filters.getGenres());
+        String sortBy = filters.getSortBy();
+        Pageable pageable = PageRequest.of(filters.getPageNo(), filters.getPageSize(), Sort.by(sortBy.equals("DESC") ? Sort.Direction.DESC : Sort.Direction.ASC, "startDate"));
         Specification<Event> spec = (root, query, cb) -> cb.conjunction();
 
+        if (filters.getLocations() != null && !filters.getLocations().isEmpty()){
+            spec = spec.and(EventSpecification.hasCityStatePairs(filters.getLocations()));
+        }
+
+        if (filters.getEventTypes() != null && !filters.getEventTypes().isEmpty()){
+            spec = spec.and(EventSpecification.hasEventType(filters.getEventTypes()));
+        }
+
+        if (filters.getEventDate() != null){
+            spec = spec.and(EventSpecification.hasEventDate(filters.getEventDate()));
+        }
+
+        if (filters.getGenres() != null && !filters.getGenres().isEmpty()){
+            spec = spec.and(EventSpecification.hasGenre(filters.getGenres()));
+        }
+
+            /*
         if (city != null && !city.isEmpty()){
             if (state != null && !state.isEmpty()){
                 spec = spec.and(EventSpecification.hasLocation(state, city));
             }
         }
+
+
         if (eventType != null){
             spec = spec.and(EventSpecification.hasEventType(eventType));
         }
@@ -62,6 +87,8 @@ public class EventService {
         if (date != null){
             spec = spec.and(EventSpecification.hasEventDate(date));
         }
+
+             */
 
 
         Page<Event> eventsPage = eventRepository.findAll(spec, pageable);

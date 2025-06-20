@@ -69,7 +69,4 @@ public class Event {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private ZonedDateTime updatedAt;
-
-    @ManyToMany(mappedBy = "events")
-    private Set<Artist> artists;
 }

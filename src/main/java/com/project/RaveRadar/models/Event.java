@@ -69,4 +69,12 @@ public class Event {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private ZonedDateTime updatedAt;
+
+    @ManyToMany
+    @JoinTable(
+            name = "artist_events",
+            joinColumns = @JoinColumn(name = "event_id"),
+            inverseJoinColumns = @JoinColumn(name = "artist_id")
+    )
+    private Set<Artist> attendingArtists;
 }

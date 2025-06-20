@@ -2,6 +2,9 @@ package com.project.RaveRadar.models;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -35,4 +38,13 @@ public class UserProfile {
 
     @Column(length = 255)
     private String pronouns;
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_favorite_artists",
+            joinColumns = @JoinColumn(name = "user_profile_id"),
+            inverseJoinColumns = @JoinColumn(name = "artist_id")
+    )
+    private Set<Artist> favoriteArtists = new HashSet<>();
+
 }

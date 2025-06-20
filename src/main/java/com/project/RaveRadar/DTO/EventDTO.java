@@ -26,6 +26,7 @@ public class EventDTO {
     private String imagePath;
     private String supportEmail;
     private AgeRestriction ageRestriction;
+    private Set<FavoriteArtistDTO> attendingArtists;
     private ZonedDateTime createdAt;
     private ZonedDateTime updatedAt;
 
@@ -45,6 +46,7 @@ public class EventDTO {
         this.supportEmail = event.getSupportEmail();
         this.ageRestriction = event.getAgeRestriction();
         this.createdAt = event.getCreatedAt();
+        this.attendingArtists = event.getAttendingArtists().stream().map(FavoriteArtistDTO::new).collect(Collectors.toSet());
         this.updatedAt = event.getUpdatedAt();
     }
 }

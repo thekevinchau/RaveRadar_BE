@@ -2,11 +2,14 @@ package com.project.RaveRadar.DTO;
 import com.project.RaveRadar.enums.AgeRestriction;
 import com.project.RaveRadar.enums.EdmGenre;
 import com.project.RaveRadar.enums.EventType;
+import com.project.RaveRadar.models.Artist;
 import com.project.RaveRadar.models.Event;
 import lombok.Data;
 
 import java.time.ZonedDateTime;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Data
 public class EventDTO {

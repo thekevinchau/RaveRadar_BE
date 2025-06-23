@@ -6,12 +6,14 @@ import lombok.Data;
 import java.util.UUID;
 
 @Data
-public class FavoriteArtistDTO {
+public class SimpleArtistDTO {
     private UUID id;
+    private String avatarUrl;
     private String stageName;
 
-    public FavoriteArtistDTO(Artist artist){
+    public SimpleArtistDTO(Artist artist){
         this.id = artist.getId();
+        this.avatarUrl = artist.getAvatarUrl();
         this.stageName = artist.getStageName();
     }
 }

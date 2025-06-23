@@ -47,4 +47,13 @@ public class UserProfile {
     )
     private Set<Artist> favoriteArtists = new HashSet<>();
 
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_event_history",
+            joinColumns = @JoinColumn(name = "user_profile_id"),
+            inverseJoinColumns = @JoinColumn(name = "event_id")
+    )
+    private Set<Event> eventHistory = new HashSet<>();
+
 }

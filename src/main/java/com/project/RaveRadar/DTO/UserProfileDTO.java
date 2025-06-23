@@ -1,6 +1,5 @@
 package com.project.RaveRadar.DTO;
 
-import com.project.RaveRadar.models.Artist;
 import com.project.RaveRadar.models.UserProfile;
 import lombok.Data;
 
@@ -14,7 +13,8 @@ public class UserProfileDTO {
     private String bio;
     private String avatarPath;
     private String pronouns;
-    private Set<FavoriteArtistDTO> favoriteArtistNames;
+    private Set<SimpleArtistDTO> favoriteArtistNames;
+    private Set<SimpleEventDTO> eventHistory;
 
     public UserProfileDTO (UserProfile profile){
         this.name = profile.getName();
@@ -24,7 +24,11 @@ public class UserProfileDTO {
         this.pronouns = profile.getPronouns();
         this.favoriteArtistNames = profile.getFavoriteArtists()
                 .stream()
-                .map(FavoriteArtistDTO::new)
+                .map(SimpleArtistDTO::new)
+                .collect(Collectors.toSet());
+        this.eventHistory = profile.getEventHistory()
+                .stream()
+                .map(SimpleEventDTO::new)
                 .collect(Collectors.toSet());
     }
 }

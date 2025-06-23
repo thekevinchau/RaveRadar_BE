@@ -2,7 +2,6 @@ package com.project.RaveRadar.DTO;
 import com.project.RaveRadar.enums.AgeRestriction;
 import com.project.RaveRadar.enums.EdmGenre;
 import com.project.RaveRadar.enums.EventType;
-import com.project.RaveRadar.models.Artist;
 import com.project.RaveRadar.models.Event;
 import lombok.Data;
 
@@ -26,7 +25,7 @@ public class EventDTO {
     private String imagePath;
     private String supportEmail;
     private AgeRestriction ageRestriction;
-    private Set<FavoriteArtistDTO> attendingArtists;
+    private Set<SimpleArtistDTO> attendingArtists;
     private ZonedDateTime createdAt;
     private ZonedDateTime updatedAt;
 
@@ -46,7 +45,7 @@ public class EventDTO {
         this.supportEmail = event.getSupportEmail();
         this.ageRestriction = event.getAgeRestriction();
         this.createdAt = event.getCreatedAt();
-        this.attendingArtists = event.getAttendingArtists().stream().map(FavoriteArtistDTO::new).collect(Collectors.toSet());
+        this.attendingArtists = event.getAttendingArtists().stream().map(SimpleArtistDTO::new).collect(Collectors.toSet());
         this.updatedAt = event.getUpdatedAt();
     }
 }

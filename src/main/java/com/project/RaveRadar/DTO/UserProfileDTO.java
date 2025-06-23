@@ -13,7 +13,7 @@ public class UserProfileDTO {
     private String bio;
     private String avatarPath;
     private String pronouns;
-    private Set<SimpleArtistDTO> favoriteArtistNames;
+    private Set<SimpleArtistDTO> favoriteArtists;
     private Set<SimpleEventDTO> eventHistory;
 
     public UserProfileDTO (UserProfile profile){
@@ -22,7 +22,7 @@ public class UserProfileDTO {
         this.bio = profile.getBio();
         this.avatarPath = profile.getAvatarPath();
         this.pronouns = profile.getPronouns();
-        this.favoriteArtistNames = profile.getFavoriteArtists()
+        this.favoriteArtists = profile.getFavoriteArtists()
                 .stream()
                 .map(SimpleArtistDTO::new)
                 .collect(Collectors.toSet());

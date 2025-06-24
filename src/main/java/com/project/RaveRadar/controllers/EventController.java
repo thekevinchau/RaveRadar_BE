@@ -7,6 +7,7 @@ import com.project.RaveRadar.enums.EventType;
 import com.project.RaveRadar.models.Event;
 import com.project.RaveRadar.models.EventRating;
 import com.project.RaveRadar.payloads.EventFilters;
+import com.project.RaveRadar.payloads.RatingPayload;
 import com.project.RaveRadar.services.EventRatingService;
 import com.project.RaveRadar.services.EventService;
 import lombok.AllArgsConstructor;
@@ -15,6 +16,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -54,8 +57,9 @@ public class EventController {
     }
 
     @PostMapping("/review")
-    public ResponseEntity<?> createUserRating(){
-        return ResponseEntity.ok("");
+    public ResponseEntity<?> createUserRating(@AuthenticationPrincipal UserDetails user, @RequestBody RatingPayload payload){
+        System.out.println("Current user" + user);
+        return ratingService.createRating(user.getUsername(), payload);
     }
 
 

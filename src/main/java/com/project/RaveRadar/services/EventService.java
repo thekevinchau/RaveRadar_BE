@@ -72,24 +72,6 @@ public class EventService {
             spec = spec.and(EventSpecification.hasGenre(filters.getGenres()));
         }
 
-            /*
-        if (city != null && !city.isEmpty()){
-            if (state != null && !state.isEmpty()){
-                spec = spec.and(EventSpecification.hasLocation(state, city));
-            }
-        }
-
-
-        if (eventType != null){
-            spec = spec.and(EventSpecification.hasEventType(eventType));
-        }
-
-        if (date != null){
-            spec = spec.and(EventSpecification.hasEventDate(date));
-        }
-
-             */
-
 
         Page<Event> eventsPage = eventRepository.findAll(spec, pageable);
         List<Event> eventsContent = eventsPage.getContent();
@@ -101,13 +83,4 @@ public class EventService {
     //Get all events close to where user is //TODO: Figure out how to use Geospatial Data in PSQL
 
     //Get events by searchbar //TODO: EventRepository query to search every field using LIKE and OR
-
-
-    /*
-    Get all events based on certain criteria:
-        - location
-        - sorted (ascending or descending)
-        - artist attendance
-        - is it a festival?
-     */
 }

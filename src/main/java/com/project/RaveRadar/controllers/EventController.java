@@ -1,10 +1,14 @@
 package com.project.RaveRadar.controllers;
 
 import com.project.RaveRadar.DTO.EventDTO;
+import com.project.RaveRadar.DTO.EventRatingDTO;
 import com.project.RaveRadar.enums.EdmGenre;
 import com.project.RaveRadar.enums.EventType;
 import com.project.RaveRadar.models.Event;
+import com.project.RaveRadar.models.EventRating;
 import com.project.RaveRadar.payloads.EventFilters;
+import com.project.RaveRadar.payloads.RatingPayload;
+import com.project.RaveRadar.services.EventRatingService;
 import com.project.RaveRadar.services.EventService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -12,6 +16,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -23,6 +29,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class EventController {
     private final EventService eventService;
+    private final EventRatingService ratingService;
 
     @GetMapping("/{id}")
     public ResponseEntity<EventDTO> getEventById(@PathVariable UUID id){
@@ -42,6 +49,17 @@ public class EventController {
             @RequestBody EventFilters filters
             ){
         return eventService.getAllEventsByCriteria(filters);
+    }
+
+    @GetMapping("/review/{id}")
+    public ResponseEntity<EventRatingDTO> getRating(@PathVariable UUID id){
+        return ratingService.getRating(id);
+    }
+
+    @PostMapping("/review")
+    public ResponseEntity<?> createUserRating(@AuthenticationPrincipal UserDetails user, @RequestBody RatingPayload payload){
+        System.out.println("Current user" + user);
+        return ratingService.createRating(user.getUsername(), payload);
     }
 
 

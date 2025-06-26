@@ -16,6 +16,7 @@ public class EventRatingDTO {
     private Integer crowdRating;
     private Integer venueRating;
     private Integer overallRating;
+    private boolean isEdited;
     private String comment;
     private LocalDate createdTime;
 
@@ -34,7 +35,7 @@ public class EventRatingDTO {
         this.venueRating = rating.getRatingVenue();
         this.overallRating = rating.getRatingOverall();
         this.comment = rating.getComment();
-
+        this.isEdited = rating.isEdited();
         if (rating.getCreatedAt() != null) {
             this.createdTime = rating.getCreatedAt().toLocalDate();
         }

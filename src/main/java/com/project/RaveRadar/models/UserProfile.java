@@ -39,7 +39,7 @@ public class UserProfile {
     @Column(length = 255)
     private String pronouns;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "user_favorite_artists",
             joinColumns = @JoinColumn(name = "user_profile_id"),
@@ -48,7 +48,7 @@ public class UserProfile {
     private Set<Artist> favoriteArtists = new HashSet<>();
 
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "user_event_history",
             joinColumns = @JoinColumn(name = "user_profile_id"),

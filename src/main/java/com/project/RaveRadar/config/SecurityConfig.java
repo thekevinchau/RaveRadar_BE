@@ -33,6 +33,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/events/**").permitAll();
                     auth.requestMatchers("/users/login").permitAll(); //everyone can log in if they want
+                    auth.requestMatchers("/user-profile/**").permitAll();
                     auth.requestMatchers("/users/register").permitAll(); //everyone can log in if they want
                     auth.requestMatchers("/logout").permitAll(); //everyone can logout if they want
                     auth.requestMatchers("/error").permitAll();

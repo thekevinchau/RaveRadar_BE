@@ -48,6 +48,9 @@ public class EventRating {
     @Column(columnDefinition = "TEXT")
     private String comment;
 
+    @Column(columnDefinition = "BOOLEAN")
+    private boolean isEdited;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

@@ -24,4 +24,14 @@ public class GlobalExceptionHandler {
         // Optional: parse the cause to detect specific constraint name or database message
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse(409, message));
     }
+
+    @ExceptionHandler(ResourceAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleResourceAlreadyExists(ResourceAlreadyExistsException exception){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(409, exception.getMessage()));
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException exception){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(400, exception.getMessage()));
+    }
 }

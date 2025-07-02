@@ -7,9 +7,11 @@ import com.project.RaveRadar.enums.EventType;
 import com.project.RaveRadar.models.Event;
 import com.project.RaveRadar.models.EventRating;
 import com.project.RaveRadar.payloads.EventFilters;
+import com.project.RaveRadar.payloads.EventListPayload;
 import com.project.RaveRadar.payloads.RatingPayload;
 import com.project.RaveRadar.services.EventRatingService;
 import com.project.RaveRadar.services.EventService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -49,6 +51,11 @@ public class EventController {
             @RequestBody EventFilters filters
             ){
         return eventService.getAllEventsByCriteria(filters);
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<List<EventDTO>> createEvents(@RequestBody @Valid EventListPayload payload){
+        return eventService.createEventsInBulk(payload.getEventPayload());
     }
 
     @GetMapping("/review/{id}")

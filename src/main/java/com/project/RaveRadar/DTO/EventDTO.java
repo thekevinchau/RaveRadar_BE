@@ -6,6 +6,7 @@ import com.project.RaveRadar.models.Event;
 import lombok.Data;
 
 import java.time.ZonedDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -45,7 +46,12 @@ public class EventDTO {
         this.supportEmail = event.getSupportEmail();
         this.ageRestriction = event.getAgeRestriction();
         this.createdAt = event.getCreatedAt();
-        this.attendingArtists = event.getAttendingArtists().stream().map(SimpleArtistDTO::new).collect(Collectors.toSet());
+        if (event.getAttendingArtists() != null && event.getAttendingArtists().size() >= 1){
+            this.attendingArtists = event.getAttendingArtists().stream().map(SimpleArtistDTO::new).collect(Collectors.toSet());
+        }
+        else{
+            this.attendingArtists = new HashSet<>();
+        }
         this.updatedAt = event.getUpdatedAt();
     }
 }

@@ -7,6 +7,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -16,7 +18,7 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
 
     Page<Event> findAll(Specification<Event> spec, Pageable pageable);
 
-
+    Optional<Event> findByName(String name);
     //Get all events close to a particular user
 
     //Get all events close to where user is

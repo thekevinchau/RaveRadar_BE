@@ -6,6 +6,7 @@ import com.project.RaveRadar.enums.EdmGenre;
 import com.project.RaveRadar.enums.EventType;
 import com.project.RaveRadar.models.Event;
 import com.project.RaveRadar.models.EventRating;
+import com.project.RaveRadar.payloads.EventCreationPayload;
 import com.project.RaveRadar.payloads.EventFilters;
 import com.project.RaveRadar.payloads.EventListPayload;
 import com.project.RaveRadar.payloads.RatingPayload;
@@ -52,21 +53,14 @@ public class EventController {
             ){
         return eventService.getAllEventsByCriteria(filters);
     }
-
     @PostMapping("/create")
+    public ResponseEntity<EventDTO> createSingleEvent(@Valid EventCreationPayload payload){
+        return eventService.createEvent(payload);
+    }
+
+    @PostMapping("/bulk-create")
     public ResponseEntity<List<EventDTO>> createEvents(@RequestBody @Valid EventListPayload payload){
         return eventService.createEventsInBulk(payload.getEventPayload());
-    }
-
-    @GetMapping("/review/{id}")
-    public ResponseEntity<EventRatingDTO> getRating(@PathVariable UUID id){
-        return ratingService.getRating(id);
-    }
-
-    @PostMapping("/review")
-    public ResponseEntity<?> createUserRating(@AuthenticationPrincipal UserDetails user, @RequestBody RatingPayload payload){
-        System.out.println("Current user" + user);
-        return ratingService.createRating(user.getUsername(), payload);
     }
 
 

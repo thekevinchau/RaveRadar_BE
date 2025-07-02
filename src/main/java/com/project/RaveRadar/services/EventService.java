@@ -8,6 +8,7 @@ import com.project.RaveRadar.models.Event;
 import com.project.RaveRadar.payloads.EventCreationPayload;
 import com.project.RaveRadar.payloads.EventFilters;
 import com.project.RaveRadar.repositories.EventRepository;
+import com.project.RaveRadar.utils.DateUtils;
 import com.project.RaveRadar.utils.EventSpecification;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -100,6 +101,7 @@ public class EventService {
         if (eventRepository.findByName(payload.getEventName()).isPresent()){
             throw new ResourceAlreadyExistsException("An event with that name already exists!");
         }
+        DateUtils.validateStartBeforeEndDate(payload.getEventName(), payload.getStartDate(), payload.getEndDate());
         Event newEvent = createEventFromPayload(payload);
         Event savedEvent = eventRepository.save(newEvent);
         return ResponseEntity.ok(new EventDTO(savedEvent));
@@ -114,6 +116,7 @@ public class EventService {
         }
 
         for (EventCreationPayload payload : eventsPayload){
+            DateUtils.validateStartBeforeEndDate(payload.getEventName(), payload.getStartDate(), payload.getEndDate());
             if (eventRepository.findByName(payload.getEventName()).isPresent()){
                 throw new ResourceAlreadyExistsException("An event with the name " + payload.getEventName() + " exists!");
             }

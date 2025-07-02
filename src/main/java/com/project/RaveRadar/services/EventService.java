@@ -1,26 +1,25 @@
 package com.project.RaveRadar.services;
 
 import com.project.RaveRadar.DTO.EventDTO;
-import com.project.RaveRadar.enums.EventType;
+import com.project.RaveRadar.exceptions.BadRequestException;
 import com.project.RaveRadar.exceptions.NotFoundException;
+import com.project.RaveRadar.exceptions.ResourceAlreadyExistsException;
 import com.project.RaveRadar.models.Event;
+import com.project.RaveRadar.payloads.EventCreationPayload;
 import com.project.RaveRadar.payloads.EventFilters;
 import com.project.RaveRadar.repositories.EventRepository;
 import com.project.RaveRadar.utils.EventSpecification;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.web.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -80,7 +79,53 @@ public class EventService {
 
     }
 
+    private static Event createEventFromPayload(EventCreationPayload payload) {
+        Event newEvent = new Event();
+        newEvent.setEventType(payload.getEventType());
+        newEvent.setDescription(payload.getDescription());
+        newEvent.setName(payload.getEventName());
+        newEvent.setGenre(payload.getGenre());
+        newEvent.setExternalLink(payload.getExternalLink());
+        newEvent.setAgeRestriction(payload.getAgeRestriction());
+        newEvent.setStartDate(payload.getStartDate());
+        newEvent.setEndDate(payload.getEndDate());
+        return newEvent;
+    }
     //Get all events close to where user is //TODO: Figure out how to use Geospatial Data in PSQL
 
     //Get events by searchbar //TODO: EventRepository query to search every field using LIKE and OR
+    @Transactional
+    public ResponseEntity<EventDTO> createEvent(EventCreationPayload payload){
+
+        if (eventRepository.findByName(payload.getEventName()).isPresent()){
+            throw new ResourceAlreadyExistsException("An event with that name already exists!");
+        }
+        Event newEvent = createEventFromPayload(payload);
+        Event savedEvent = eventRepository.save(newEvent);
+        return ResponseEntity.ok(new EventDTO(savedEvent));
+    }
+
+    @Transactional
+    public ResponseEntity<List<EventDTO>> createEventsInBulk(List<EventCreationPayload> eventsPayload){
+        List<Event> eventsToBeSaved = new ArrayList<>();
+
+        if (eventsPayload.isEmpty()){
+            throw new BadRequestException("Please add at least one event!");
+        }
+
+        for (EventCreationPayload payload : eventsPayload){
+            if (eventRepository.findByName(payload.getEventName()).isPresent()){
+                throw new ResourceAlreadyExistsException("An event with the name " + payload.getEventName() + " exists!");
+            }
+            else{
+                Event newEvent = createEventFromPayload(payload);
+                eventsToBeSaved.add(newEvent);
+            }
+        }
+        List<Event> savedEvents = eventRepository.saveAll(eventsToBeSaved);
+        List<EventDTO> eventDTOs = savedEvents.stream().map(EventDTO::new).toList();
+        return ResponseEntity.ok(eventDTOs);
+    }
+
+
 }

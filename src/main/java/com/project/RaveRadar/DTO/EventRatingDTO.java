@@ -1,12 +1,13 @@
 package com.project.RaveRadar.DTO;
-
 import com.project.RaveRadar.models.EventRating;
 import lombok.Data;
+import lombok.Getter;
 
 import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
+@Getter
 public class EventRatingDTO {
     private UUID id;
     private SimpleUserProfileDTO reviewer;

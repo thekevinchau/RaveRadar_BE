@@ -15,7 +15,7 @@ CREATE TABLE user_profile (
 	bio TEXT,
 	avatar_path TEXT, --path to the s3 bucket image
 	pronouns VARCHAR(255)
-)
+);
 CREATE TABLE addresses (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
 	venue_name TEXT,
@@ -120,5 +120,4 @@ SELECT * FROM user_favorite_artists;
 SELECT * FROM event;
 SELECT * FROM event_rating;
 SELECT * FROM user_event_history;
-SELECT * FROM event_rating;
 

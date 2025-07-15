@@ -3,57 +3,45 @@ package com.project.RaveRadar.models;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Table(name = "user_profile")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Table(name = "user_profile")
 public class UserProfile {
 
     @Id
-    @GeneratedValue
-    @Column(columnDefinition = "uuid", updatable = false, nullable = false)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(length = 255)
-    private String name;
+    @Column(name = "display_name", unique = true)
+    private String displayName;
 
-    @Column(length = 255, unique = true, nullable = false)
-    private String username;
+    @Column(name = "gender")
+    private String gender;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "bio", columnDefinition = "TEXT")
     private String bio;
 
-    @Column(name = "avatar_path", columnDefinition = "TEXT")
-    private String avatarPath;
+    @Column(name = "avatar_url")
+    private String avatarUrl;
 
-    @Column(length = 255)
-    private String pronouns;
+    @OneToOne(optional = false, cascade = CascadeType.ALL)
+    @JoinColumn(name = "personal_details_id", unique = true)
+    private ProfilePersonalDetails personalDetails;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "user_favorite_artists",
-            joinColumns = @JoinColumn(name = "user_profile_id"),
-            inverseJoinColumns = @JoinColumn(name = "artist_id")
-    )
-    private Set<Artist> favoriteArtists = new HashSet<>();
+    @Column(nullable = false, updatable = false)
+    private Instant createdAt = Instant.now();
 
-
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "user_event_history",
-            joinColumns = @JoinColumn(name = "user_profile_id"),
-            inverseJoinColumns = @JoinColumn(name = "event_id")
-    )
-    private Set<Event> eventHistory = new HashSet<>();
-
+    @Column(nullable = false)
+    private Instant updatedAt = Instant.now();
 }

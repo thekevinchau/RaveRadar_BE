@@ -26,13 +26,11 @@ public class UserService {
     private JwtUtil jwtUtil;
 
     private final UserRepository userRepository;
-    private final UserProfileService userProfileService;
 
-    public UserService(PasswordEncoder passwordEncoder, AuthenticationManager manager, UserRepository userRepository, UserProfileService userProfileService) {
+    public UserService(PasswordEncoder passwordEncoder, AuthenticationManager manager, UserRepository userRepository) {
         this.passwordEncoder = passwordEncoder;
         this.manager = manager;
         this.userRepository = userRepository;
-        this.userProfileService = userProfileService;
     }
 
     @Transactional
@@ -45,7 +43,6 @@ public class UserService {
             newUser.setPassword(passwordEncoder.encode(currentPassword));
             newUser.setRole("ROLE_USER");
             User savedUser = userRepository.save(newUser);
-            userProfileService.createUserProfile(savedUser, payload.getUsername());
             return ResponseEntity.ok("Success");
         }
         return ResponseEntity.ok("user already exists!");

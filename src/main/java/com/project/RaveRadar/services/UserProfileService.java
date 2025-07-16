@@ -5,6 +5,7 @@ import com.project.RaveRadar.DTO.ProfileExternalLinkDTO;
 import com.project.RaveRadar.DTO.UserProfileDTO;
 import com.project.RaveRadar.enums.Gender;
 import com.project.RaveRadar.exceptions.NotFoundException;
+import com.project.RaveRadar.exceptions.ResourceAlreadyExistsException;
 import com.project.RaveRadar.models.ProfilePersonalDetails;
 import com.project.RaveRadar.models.User;
 import com.project.RaveRadar.models.UserProfile;
@@ -99,12 +100,20 @@ public class UserProfileService {
             throw new NotFoundException("User was not found!");
         }
         links.forEach(link -> {
-            link.setUserProfile(profile.get());
+            Optional<UserProfileLink> currentLink = profileLinkRepository.findByUserProfileAndPlatform(profile.get(), link.getPlatform());
+            if (currentLink.isPresent()){
+                throw new ResourceAlreadyExistsException(currentLink.get().getPlatform() + " is already on your profile!");
+            }
+            else {
+                link.setUserProfile(profile.get());
+            }
         });
         UserProfileDTO profileDTO = new UserProfileDTO(profile.get());
-        List<UserProfileLink> savedLinks = profileLinkRepository.saveAll(links);
-        Set<ProfileExternalLinkDTO> savedDTOs = savedLinks.stream().map(ProfileExternalLinkDTO::new).collect(Collectors.toSet());
-        profileDTO.setExternalLinkDTOs(savedDTOs);
+        profileLinkRepository.saveAll(links);
+        Set<ProfileExternalLinkDTO> externalLinkDTOS = profileLinkRepository.findByUserProfile(profile.get())
+                .stream()
+                .map(ProfileExternalLinkDTO::new).collect(Collectors.toSet());
+        profileDTO.setExternalLinkDTOs(externalLinkDTOS);
         return ResponseEntity.ok(profileDTO);
     }
 

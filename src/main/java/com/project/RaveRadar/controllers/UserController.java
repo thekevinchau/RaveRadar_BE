@@ -23,8 +23,11 @@ import java.util.UUID;
 public class UserController {
     private final UserService userService;
     private final UserProfileService profileService;
-    private final AuthUtil authUtil;
 
+    @GetMapping("/profiles/{id}")
+    public ResponseEntity<UserProfileDTO> getUserProfile(@PathVariable UUID id){
+        return profileService.getUserProfile(id);
+    }
 
     @PostMapping("/login")
     public ResponseEntity<String> login (@RequestBody User user){

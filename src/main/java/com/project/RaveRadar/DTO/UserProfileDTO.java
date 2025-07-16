@@ -18,7 +18,7 @@ public class UserProfileDTO {
     private String bio;
     private String avatarUrl;
     PersonalDetailsDTO personalDetailsDTO;
-    Set<ProfileExternalLinkDTO> externalLinkDTOs;
+    Set<ProfileExternalLinkDTO> externalLinks;
     private Instant createdAt;
     private Instant updatedAt;
 

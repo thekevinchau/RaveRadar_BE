@@ -1,10 +1,9 @@
 package com.project.RaveRadar.payloads;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Data;
+
+import java.time.LocalDate;
 
 @Data
 public class UserRegPayload {
@@ -27,6 +26,12 @@ public class UserRegPayload {
             regexp = "^[a-zA-Z0-9._-]{3,20}$",
             message = "Username can only contain letters, numbers, underscores, hyphens, and periods"
     )
-    private String username;
+    private String displayName;
+
+    @NotBlank( message = "Birthday is required")
+    @NotNull
+    private String birthday;
+
+    private String phoneNumber;
 }
 

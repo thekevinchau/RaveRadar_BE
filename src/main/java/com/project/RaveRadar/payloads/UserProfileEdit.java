@@ -2,7 +2,10 @@ package com.project.RaveRadar.payloads;
 
 import com.project.RaveRadar.DTO.PersonalDetailsDTO;
 import com.project.RaveRadar.enums.Gender;
+import com.project.RaveRadar.models.UserProfileLink;
 import lombok.Data;
+
+import java.util.Set;
 
 @Data
 public class UserProfileEdit {
@@ -12,4 +15,5 @@ public class UserProfileEdit {
     private String bio;
     private String avatarUrl;
     PersonalDetailsDTO personalDetails;
+    Set<UserProfileLink> externalLinks;
 }

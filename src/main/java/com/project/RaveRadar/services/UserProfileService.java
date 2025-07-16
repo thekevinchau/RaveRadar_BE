@@ -1,14 +1,17 @@
 package com.project.RaveRadar.services;
 
 
+import com.project.RaveRadar.DTO.ProfileExternalLinkDTO;
 import com.project.RaveRadar.DTO.UserProfileDTO;
 import com.project.RaveRadar.enums.Gender;
 import com.project.RaveRadar.exceptions.NotFoundException;
 import com.project.RaveRadar.models.ProfilePersonalDetails;
 import com.project.RaveRadar.models.User;
 import com.project.RaveRadar.models.UserProfile;
+import com.project.RaveRadar.models.UserProfileLink;
 import com.project.RaveRadar.payloads.UserProfileEdit;
 import com.project.RaveRadar.repositories.ProfilePersonalDetailsRepository;
+import com.project.RaveRadar.repositories.UserProfileLinkRepository;
 import com.project.RaveRadar.repositories.UserProfileRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -17,14 +20,15 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class UserProfileService {
     private final UserProfileRepository profileRepository;
     private final ProfilePersonalDetailsRepository personalDetailsRepository;
+    private final UserProfileLinkRepository profileLinkRepository;
 
     @Transactional
     private ProfilePersonalDetails createProfilePersonalDetails(LocalDate birthday, String phoneNumber){
@@ -86,8 +90,22 @@ public class UserProfileService {
             updatedProfile.setPersonalDetails(detailsEdits);
         }
         return ResponseEntity.ok(new UserProfileDTO(profileRepository.save(updatedProfile)));
+    }
 
-
+    @Transactional
+    public ResponseEntity<UserProfileDTO> addProfileExternalLink (UUID profileId, Set<UserProfileLink> links){
+        Optional<UserProfile> profile = profileRepository.findById(profileId);
+        if (profile.isEmpty()){
+            throw new NotFoundException("User was not found!");
+        }
+        links.forEach(link -> {
+            link.setUserProfile(profile.get());
+        });
+        UserProfileDTO profileDTO = new UserProfileDTO(profile.get());
+        List<UserProfileLink> savedLinks = profileLinkRepository.saveAll(links);
+        Set<ProfileExternalLinkDTO> savedDTOs = savedLinks.stream().map(ProfileExternalLinkDTO::new).collect(Collectors.toSet());
+        profileDTO.setExternalLinkDTOs(savedDTOs);
+        return ResponseEntity.ok(profileDTO);
     }
 
 }

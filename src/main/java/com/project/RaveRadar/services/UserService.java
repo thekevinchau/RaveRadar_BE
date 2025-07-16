@@ -2,6 +2,7 @@ package com.project.RaveRadar.services;
 
 import com.project.RaveRadar.exceptions.NotFoundException;
 import com.project.RaveRadar.models.User;
+import com.project.RaveRadar.models.UserProfile;
 import com.project.RaveRadar.payloads.UserRegPayload;
 import com.project.RaveRadar.repositories.UserRepository;
 import com.project.RaveRadar.security.JwtUtil;
@@ -15,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Service
@@ -26,11 +28,13 @@ public class UserService {
     private JwtUtil jwtUtil;
 
     private final UserRepository userRepository;
+    private final UserProfileService profileService;
 
-    public UserService(PasswordEncoder passwordEncoder, AuthenticationManager manager, UserRepository userRepository) {
+    public UserService(PasswordEncoder passwordEncoder, AuthenticationManager manager, UserRepository userRepository, UserProfileService profileService) {
         this.passwordEncoder = passwordEncoder;
         this.manager = manager;
         this.userRepository = userRepository;
+        this.profileService = profileService;
     }
 
     @Transactional
@@ -43,6 +47,7 @@ public class UserService {
             newUser.setPassword(passwordEncoder.encode(currentPassword));
             newUser.setRole("ROLE_USER");
             User savedUser = userRepository.save(newUser);
+            UserProfile newProfile = profileService.createUserProfile(savedUser, payload.getDisplayName(), LocalDate.parse(payload.getBirthday()), payload.getPhoneNumber());
             return ResponseEntity.ok("Success");
         }
         return ResponseEntity.ok("user already exists!");

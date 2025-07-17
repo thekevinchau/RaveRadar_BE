@@ -24,31 +24,26 @@ public class UserController {
     private final UserService userService;
     private final UserProfileService profileService;
 
+    @PostMapping("/profiles/links/{id}")
+    public ResponseEntity<UserProfileDTO> addExternalLinks(@PathVariable UUID id, @RequestBody UserProfileEdit edits){
+        return profileService.addProfileExternalLink(id, edits.getExternalLinks());
+    }
+
     @GetMapping("/profiles/{id}")
     public ResponseEntity<UserProfileDTO> getUserProfile(@PathVariable UUID id){
         return profileService.getUserProfile(id);
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<String> login (@RequestBody User user){
-        return userService.login(user);
-    }
-
-    @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody @Valid UserRegPayload payload){
-        return userService.register(payload);
     }
     @PatchMapping("/profiles/{id}")
     public ResponseEntity<UserProfileDTO> editUserProfile(@PathVariable UUID id, @RequestBody UserProfileEdit edits){
         return profileService.editUserProfile(id, edits);
     }
-    @PatchMapping("/profiles/external-links/{id}")
-    public ResponseEntity<UserProfileDTO> editProfileExternalLinks(@PathVariable UUID id, @RequestBody UserProfileEdit edits){
+    @PatchMapping("/profiles/links/{id}")
+    public ResponseEntity<UserProfileDTO> editExternalLinks(@PathVariable UUID id, @RequestBody UserProfileEdit edits){
         return profileService.editProfileExternalLinks(id, edits.getExternalLinks());
     }
-
-    @PostMapping("/profiles/external-links/{id}")
-    public ResponseEntity<UserProfileDTO> addProfileExternalLinks(@PathVariable UUID id, @RequestBody UserProfileEdit edits){
-        return profileService.addProfileExternalLink(id, edits.getExternalLinks());
+    @DeleteMapping("/profiles/links/{profileId}/{linkId}")
+    public ResponseEntity<String> deleteExternalLink(@PathVariable UUID profileId, @PathVariable UUID linkId){
+        return profileService.deleteProfileExternalLink(profileId, linkId);
     }
+
 }

@@ -31,6 +31,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> {
+                    auth.requestMatchers("/auth/**").permitAll();
                     auth.requestMatchers("/events/**").permitAll();
                     auth.requestMatchers("/users/login").permitAll(); //everyone can log in if they want
                     auth.requestMatchers("/users/register").permitAll(); //everyone can log in if they want

@@ -92,7 +92,6 @@ public class UserProfileService {
             UserProfileDTO returnedProfile = new UserProfileDTO(profile.get());
             returnedProfile.setPersonalDetailsDTO(null);
             return ResponseEntity.ok(returnedProfile);
-
         }
     }
 
@@ -117,14 +116,14 @@ public class UserProfileService {
         }
         UserProfile queriedProfile = profile.get();
         UserProfile updatedProfile = handleProfileEdits(queriedProfile, edits.getDisplayName(), edits.getGender(), edits.getBio(), edits.getAvatarUrl());
+        updatedProfile.setUpdatedAt(Instant.now());
         if (edits.getPersonalDetails() != null){
             String birthday = String.valueOf(edits.getPersonalDetails().getBirthday());
             String phoneNumber = edits.getPersonalDetails().getPhoneNumber();
-            //this gets saved
             ProfilePersonalDetails detailsEdits = handlePersonalDetailsEdits(queriedProfile.getPersonalDetails(), birthday, phoneNumber);
             updatedProfile.setPersonalDetails(detailsEdits);
         }
-        return ResponseEntity.ok(new UserProfileDTO(profileRepository.save(updatedProfile)));
+        return getUserProfile(userId);
     }
 
     @Transactional
@@ -145,14 +144,28 @@ public class UserProfileService {
                 link.setUserProfile(profile.get());
             }
         });
-        UserProfileDTO profileDTO = new UserProfileDTO(profile.get());
         profileLinkRepository.saveAll(links);
-        Set<ProfileExternalLinkDTO> externalLinkDTOS = profileLinkRepository.findByUserProfile(profile.get())
-                .stream()
-                .map(ProfileExternalLinkDTO::new).collect(Collectors.toSet());
-        profileDTO.setExternalLinks(externalLinkDTOS);
-        return ResponseEntity.ok(profileDTO);
+        return getUserProfile(profileId);
     }
 
-
+    @Transactional
+    public ResponseEntity<UserProfileDTO> editProfileExternalLinks (UUID profileId, Set<UserProfileLink> links){
+        Optional<UserProfile> profile = profileRepository.findById(profileId);
+        if (profile.isEmpty()){
+            throw new NotFoundException("User was not found!");
+        }
+        if (!isUserProfileOwner(profile.get())){
+            throw new ForbiddenException("You are not allowed to access this resource");
+        }
+        links.forEach(link -> {
+            UserProfileLink queriedLink = profileLinkRepository.findById(link.getId()).orElseThrow(() -> new NotFoundException("Not found"));
+            if (queriedLink.getUserProfile() != profile.get()){
+                throw new ForbiddenException("This link does not belong to you to edit");
+            }
+            queriedLink.setExternalLink(link.getExternalLink());
+            queriedLink.setPlatform(link.getPlatform());
+            profileLinkRepository.save(queriedLink);
+        });
+        return getUserProfile(profileId);
+    }
 }

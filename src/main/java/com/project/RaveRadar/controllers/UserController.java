@@ -42,6 +42,11 @@ public class UserController {
     public ResponseEntity<UserProfileDTO> editUserProfile(@PathVariable UUID id, @RequestBody UserProfileEdit edits){
         return profileService.editUserProfile(id, edits);
     }
+    @PatchMapping("/profiles/external-links/{id}")
+    public ResponseEntity<UserProfileDTO> editProfileExternalLinks(@PathVariable UUID id, @RequestBody UserProfileEdit edits){
+        return profileService.editProfileExternalLinks(id, edits.getExternalLinks());
+    }
+
     @PostMapping("/profiles/external-links/{id}")
     public ResponseEntity<UserProfileDTO> addProfileExternalLinks(@PathVariable UUID id, @RequestBody UserProfileEdit edits){
         return profileService.addProfileExternalLink(id, edits.getExternalLinks());

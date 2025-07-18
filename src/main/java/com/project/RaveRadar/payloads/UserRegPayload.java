@@ -2,10 +2,11 @@ package com.project.RaveRadar.payloads;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import lombok.Getter;
 
 import java.time.LocalDate;
 
-@Data
+@Getter
 public class UserRegPayload {
 
     @NotBlank(message = "Email is required")

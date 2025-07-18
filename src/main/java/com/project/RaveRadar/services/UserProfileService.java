@@ -18,6 +18,7 @@ import com.project.RaveRadar.repositories.UserProfileRepository;
 import com.project.RaveRadar.utils.AuthUtil;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -37,7 +38,7 @@ public class UserProfileService {
     //Checks if the current user that is logged in matches the same user that the profile is being queried on.
     private boolean isUserProfileOwner(UserProfile profile){
         User user = authUtil.getCurrentUser();
-        return user.getId() == profile.getUser().getId();
+        return user.getId().equals(profile.getUser().getId());
     }
 
     @Transactional
@@ -52,8 +53,13 @@ public class UserProfileService {
 
 
     private UserProfile handleProfileEdits(UserProfile profile, String displayName, Gender gender, String bio, String avatarUrl){
-        if (displayName != null){
-            profile.setDisplayName(displayName);
+        if (displayName != null) {
+            profileRepository.findByDisplayName(displayName).ifPresent(existingProfile -> {
+                if (!existingProfile.getId().equals(profile.getId())) {
+                    throw new ResourceAlreadyExistsException("A user with that name already exists!");
+                }
+            });
+            profile.setDisplayName(displayName.toLowerCase());
         }
         if (bio != null){
             profile.setBio(bio);
@@ -70,8 +76,12 @@ public class UserProfileService {
 
     @Transactional
     private ProfilePersonalDetails handlePersonalDetailsEdits (ProfilePersonalDetails details, String birthday, String phoneNumber){
-        details.setBirthday(LocalDate.parse(birthday));
-        details.setPhoneNumber(phoneNumber);
+        if (birthday != null && !birthday.isEmpty() && !birthday.equalsIgnoreCase("null")){
+            details.setBirthday(LocalDate.parse(birthday));
+        }
+        if (phoneNumber != null && !phoneNumber.isEmpty()){
+                details.setPhoneNumber(phoneNumber);
+        }
         return personalDetailsRepository.save(details);
     }
 
@@ -88,6 +98,7 @@ public class UserProfileService {
             dto.setExternalLinks(externalLinks);
             return ResponseEntity.ok(dto);
         }
+        //profile for public use
         else{
             UserProfileDTO returnedProfile = new UserProfileDTO(profile.get());
             returnedProfile.setPersonalDetailsDTO(null);
@@ -99,7 +110,7 @@ public class UserProfileService {
     public UserProfile createUserProfile (User user, String displayName, LocalDate birthday, String phoneNumber){
         UserProfile newProfile = new UserProfile();
         newProfile.setUser(user);
-        newProfile.setDisplayName(displayName);
+        newProfile.setDisplayName(displayName.toLowerCase());
         ProfilePersonalDetails userPersonalDetails = createProfilePersonalDetails(birthday, phoneNumber);
         newProfile.setPersonalDetails(userPersonalDetails);
         return profileRepository.save(newProfile);
@@ -135,6 +146,9 @@ public class UserProfileService {
         if (!isUserProfileOwner(profile.get())){
             throw new ForbiddenException("You are not allowed to access this resource");
         }
+        if (links == null || links.isEmpty()) {
+            throw new IllegalArgumentException("No external links provided.");
+        }
         links.forEach(link -> {
             Optional<UserProfileLink> currentLink = profileLinkRepository.findByUserProfileAndPlatform(profile.get(), link.getPlatform());
             if (currentLink.isPresent()){
@@ -157,9 +171,12 @@ public class UserProfileService {
         if (!isUserProfileOwner(profile.get())){
             throw new ForbiddenException("You are not allowed to access this resource");
         }
+        if (links == null || links.isEmpty()) {
+            throw new IllegalArgumentException("No external links provided.");
+        }
         links.forEach(link -> {
             UserProfileLink queriedLink = profileLinkRepository.findById(link.getId()).orElseThrow(() -> new NotFoundException("Not found"));
-            if (queriedLink.getUserProfile() != profile.get()){
+            if (!queriedLink.getUserProfile().equals(profile.get())){
                 throw new ForbiddenException("This link does not belong to you to edit");
             }
             queriedLink.setExternalLink(link.getExternalLink());
@@ -167,5 +184,27 @@ public class UserProfileService {
             profileLinkRepository.save(queriedLink);
         });
         return getUserProfile(profileId);
+    }
+
+    @Transactional
+    public ResponseEntity<String> deleteProfileExternalLink (UUID profileId, UUID linkId){
+        Optional<UserProfile> profile = profileRepository.findById(profileId);
+        if (profile.isEmpty()){
+            throw new NotFoundException("User was not found!");
+        }
+        if (!isUserProfileOwner(profile.get())){
+            throw new ForbiddenException("You are not allowed to access this resource");
+        }
+
+        //verify if the profileExternalLink belongs to the current profile
+        UserProfileLink link = profileLinkRepository.findById(linkId).orElseThrow(() -> new NotFoundException("External link not found."));
+
+        if (link.getUserProfile() != profile.get()){
+            throw new ForbiddenException("This link does not belong to you to edit");
+        }
+        else{
+            profileLinkRepository.deleteById(linkId);
+        }
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Successfully deleted" + link.getPlatform());
     }
 }

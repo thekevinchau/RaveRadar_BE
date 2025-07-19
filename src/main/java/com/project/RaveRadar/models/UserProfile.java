@@ -45,5 +45,10 @@ public class UserProfile {
     @Column(nullable = false)
     private Instant updatedAt = Instant.now();
 
-
+    @ManyToMany
+    @JoinTable(
+            name = "user_favorited_events",
+            joinColumns = @JoinColumn(name = "favorited_by"),
+            inverseJoinColumns = @JoinColumn(name = "favorited_event"))
+    Set<Event> favoriteEvents;
 }

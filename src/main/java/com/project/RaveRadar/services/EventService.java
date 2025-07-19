@@ -3,8 +3,10 @@ package com.project.RaveRadar.services;
 import com.project.RaveRadar.DTO.EventDTO;
 import com.project.RaveRadar.exceptions.NotFoundException;
 import com.project.RaveRadar.models.Event;
+import com.project.RaveRadar.models.UserProfile;
 import com.project.RaveRadar.payloads.EventPayload;
 import com.project.RaveRadar.repositories.EventRepository;
+import com.project.RaveRadar.utils.AuthUtil;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,19 +21,20 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
 @Service
 public class EventService {
     private final EventRepository eventRepository;
+    private final AuthUtil authUtil;
 
     private String emptyToNull(String value) {
         return (value == null || value.trim().isEmpty()) ? null : value;
     }
 
-    private Event getEventObj(UUID eventId){
+
+    protected Event getEventObj(UUID eventId){
         return eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event does not exist!"));
     }
 

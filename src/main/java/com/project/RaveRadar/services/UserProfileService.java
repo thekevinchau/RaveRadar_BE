@@ -7,10 +7,7 @@ import com.project.RaveRadar.enums.Gender;
 import com.project.RaveRadar.exceptions.ForbiddenException;
 import com.project.RaveRadar.exceptions.NotFoundException;
 import com.project.RaveRadar.exceptions.ResourceAlreadyExistsException;
-import com.project.RaveRadar.models.ProfilePersonalDetails;
-import com.project.RaveRadar.models.User;
-import com.project.RaveRadar.models.UserProfile;
-import com.project.RaveRadar.models.UserProfileLink;
+import com.project.RaveRadar.models.*;
 import com.project.RaveRadar.payloads.UserProfileEdit;
 import com.project.RaveRadar.repositories.ProfilePersonalDetailsRepository;
 import com.project.RaveRadar.repositories.UserProfileLinkRepository;
@@ -33,12 +30,17 @@ public class UserProfileService {
     private final UserProfileRepository profileRepository;
     private final ProfilePersonalDetailsRepository personalDetailsRepository;
     private final UserProfileLinkRepository profileLinkRepository;
+    private final EventService eventService;
     private final AuthUtil authUtil;
 
     //Checks if the current user that is logged in matches the same user that the profile is being queried on.
-    private boolean isUserProfileOwner(UserProfile profile){
+    public boolean isUserProfileOwner(UserProfile profile){
         User user = authUtil.getCurrentUser();
         return user.getId().equals(profile.getUser().getId());
+    }
+
+    public UserProfile getMyProfile(){
+        return profileRepository.findByUser(authUtil.getCurrentUser()).orElseThrow(() -> new NotFoundException("User not found"));
     }
 
     @Transactional
@@ -207,4 +209,21 @@ public class UserProfileService {
         }
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Successfully deleted" + link.getPlatform());
     }
+
+    @Transactional
+    public ResponseEntity<UserProfileDTO> favoriteEvent(UUID eventId){
+        UserProfile profile = getMyProfile();
+        Set<Event> favoriteEvents = profile.getFavoriteEvents();
+        favoriteEvents.add(eventService.getEventObj(eventId));
+        return ResponseEntity.ok(new UserProfileDTO(profileRepository.save(profile)));
+    }
+
+    /*
+    @Transactional
+    public ResponseEntity<UserProfileDTO> unfavoriteEvent(UUID eventId){
+        UserProfile profile = getMyProfile();
+        Set<Event>
+    }
+
+     */
 }

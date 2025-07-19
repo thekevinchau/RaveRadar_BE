@@ -5,14 +5,12 @@ import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 
 @Getter
-public class EventCreation {
+public class EventPayload {
     @NotBlank(message = "Event name is required.")
     private String eventName;
 

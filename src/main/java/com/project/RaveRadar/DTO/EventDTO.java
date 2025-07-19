@@ -11,6 +11,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -20,34 +22,35 @@ import java.util.UUID;
 public class EventDTO {
 
     private UUID id;
-    private String eventName;
-    private String description;
-    private EventType eventType;
-    private String bannerUrl;
-    private String avatarUrl;
-    private String address;
-    private String city;
-    private String state;
-    private String zipcode;
-    private String venueName;
-    private Instant startDate;
-    private Instant endDate;
+    private Location location;
+    private EventDetails details;
+    private ImageURLs imageUrls;
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Data
+    public static class EventDetails {
+        private String eventName;
+        private String description;
+        private EventType eventType;
+        private Instant startDate;
+        private Instant endDate;
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Data
+    public static class ImageURLs{
+        private String bannerUrl;
+        private String avatarUrl;
+    }
 
 
     public EventDTO(Event event) {
         this.id = event.getId();
-        this.eventName = event.getEventName();
-        this.description = event.getDescription();
-        this.eventType = event.getEventType();
-        this.bannerUrl = event.getBannerUrl();
-        this.avatarUrl = event.getAvatarUrl();
-        this.address = event.getAddress();
-        this.city = event.getCity();
-        this.state = event.getState();
-        this.zipcode = event.getZipcode();
-        this.venueName = event.getVenueName();
-        this.startDate = event.getStartDate();
-        this.endDate = event.getEndDate();
+        this.location = new Location(event.getVenueName(),event.getAddress(), event.getCity(), event.getState(), event.getZipcode());
+        this.details = new EventDetails(event.getEventName(), event.getDescription(), event.getEventType(), event.getStartDate(), event.getEndDate());
+        this.imageUrls = new ImageURLs(event.getBannerUrl(), event.getAvatarUrl());
     }
 }
 

@@ -41,6 +41,11 @@ public class UserController {
     public ResponseEntity<UserProfileDTO> editExternalLinks(@PathVariable UUID id, @RequestBody UserProfileEdit edits){
         return profileService.editProfileExternalLinks(id, edits.getExternalLinks());
     }
+    @PatchMapping("/profiles/favorite-events/{id}")
+    public ResponseEntity<UserProfileDTO> favoriteEvent(@PathVariable UUID id){
+        return profileService.favoriteEvent(id);
+    }
+
     @DeleteMapping("/profiles/links/{profileId}/{linkId}")
     public ResponseEntity<String> deleteExternalLink(@PathVariable UUID profileId, @PathVariable UUID linkId){
         return profileService.deleteProfileExternalLink(profileId, linkId);

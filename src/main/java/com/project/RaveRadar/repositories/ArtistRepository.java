@@ -1,11 +1,11 @@
 package com.project.RaveRadar.repositories;
 
-import com.project.RaveRadar.models.EventRating;
+import com.project.RaveRadar.models.Artist;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
 @Repository
-public interface EventRatingRepository extends JpaRepository<EventRating, UUID> {
+public interface ArtistRepository extends JpaRepository<Artist, UUID> {
 }

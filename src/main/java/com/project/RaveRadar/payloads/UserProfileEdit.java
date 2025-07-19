@@ -1,23 +1,20 @@
 package com.project.RaveRadar.payloads;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import com.project.RaveRadar.DTO.PersonalDetailsDTO;
+import com.project.RaveRadar.enums.Gender;
+import com.project.RaveRadar.models.UserProfileLink;
 import lombok.Data;
+import lombok.Getter;
 
-@Data
+import java.util.Set;
+
+@Getter
 public class UserProfileEdit {
-    @Size(min = 1, max=255, message = "Name must be between 1 and 255 characters.")
-    private String name;
 
-    @NotBlank(message = "Username is required")
-    @Size(min = 3, max = 20, message = "Username must be between 3 and 20 characters")
-    @Pattern(
-            regexp = "^[a-zA-Z0-9._-]{3,20}$",
-            message = "Username can only contain letters, numbers, underscores, hyphens, and periods"
-    )
-    private String username;
+    private String displayName;
+    private Gender gender;
     private String bio;
-    private String avatarPath;
-    private String pronouns;
+    private String avatarUrl;
+    PersonalDetailsDTO personalDetails;
+    Set<UserProfileLink> externalLinks;
 }

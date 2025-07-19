@@ -1,57 +1,56 @@
 package com.project.RaveRadar.DTO;
-import com.project.RaveRadar.enums.AgeRestriction;
-import com.project.RaveRadar.enums.EdmGenre;
+
+
+
 import com.project.RaveRadar.enums.EventType;
 import com.project.RaveRadar.models.Event;
-import lombok.Data;
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.Instant;
 import java.time.ZonedDateTime;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class EventDTO {
 
-    private UUID eventId;
-    private String name;
-    private String description;
-    private ZonedDateTime startDate;
-    private ZonedDateTime endDate;
-    private AddressDTO address;
-    private EventType eventType;
-    private EdmGenre genre;
-    private String externalLink;
-    private String imagePath;
-    private String supportEmail;
-    private AgeRestriction ageRestriction;
-    private Set<SimpleArtistDTO> attendingArtists;
-    private ZonedDateTime createdAt;
-    private ZonedDateTime updatedAt;
+    private UUID id;
+    private Location location;
+    private EventDetails details;
+    private ImageURLs imageUrls;
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Data
+    public static class EventDetails {
+        private String eventName;
+        private String description;
+        private EventType eventType;
+        private Instant startDate;
+        private Instant endDate;
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Data
+    public static class ImageURLs{
+        private String bannerUrl;
+        private String avatarUrl;
+    }
+
 
     public EventDTO(Event event) {
-        this.eventId = event.getEventId();
-        this.name = event.getName();
-        this.description = event.getDescription();
-        this.startDate = event.getStartDate();
-        this.endDate = event.getEndDate();
-        if (event.getAddress() != null) {
-            this.address = new AddressDTO(event.getAddress());
-        }
-        this.eventType = event.getEventType();
-        this.genre = event.getGenre();
-        this.externalLink = event.getExternalLink();
-        this.imagePath = event.getImagePath();
-        this.supportEmail = event.getSupportEmail();
-        this.ageRestriction = event.getAgeRestriction();
-        this.createdAt = event.getCreatedAt();
-        if (event.getAttendingArtists() != null && event.getAttendingArtists().size() >= 1){
-            this.attendingArtists = event.getAttendingArtists().stream().map(SimpleArtistDTO::new).collect(Collectors.toSet());
-        }
-        else{
-            this.attendingArtists = new HashSet<>();
-        }
-        this.updatedAt = event.getUpdatedAt();
+        this.id = event.getId();
+        this.location = new Location(event.getVenueName(),event.getAddress(), event.getCity(), event.getState(), event.getZipcode());
+        this.details = new EventDetails(event.getEventName(), event.getDescription(), event.getEventType(), event.getStartDate(), event.getEndDate());
+        this.imageUrls = new ImageURLs(event.getBannerUrl(), event.getAvatarUrl());
     }
 }
+

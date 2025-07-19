@@ -44,4 +44,6 @@ public class UserProfile {
 
     @Column(nullable = false)
     private Instant updatedAt = Instant.now();
+
+
 }

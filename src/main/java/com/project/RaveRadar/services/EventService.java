@@ -10,12 +10,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
@@ -35,12 +39,12 @@ public class EventService {
         return ResponseEntity.ok(new EventDTO(getEventObj(eventId)));
     }
 
-    /*
-    public ResponseEntity<EventDTO> getAllEvents(int pageNo, int pageSize){
-        Pageable pageable = PageRequest.of(pageNo, pageSize);
-    }
 
-     */
+    public ResponseEntity<List<EventDTO>> getAllEvents(int pageNo, int pageSize){
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by("startDate"));
+        List<EventDTO> events = eventRepository.findAll(pageable).getContent().stream().map(EventDTO::new).toList();
+        return ResponseEntity.ok(events);
+    }
 
     @Transactional
     public ResponseEntity<EventDTO> createEvent(EventPayload info) {

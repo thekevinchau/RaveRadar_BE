@@ -4,16 +4,17 @@ import com.project.RaveRadar.DTO.AnnouncementDTO;
 import com.project.RaveRadar.exceptions.ForbiddenException;
 import com.project.RaveRadar.exceptions.NotFoundException;
 import com.project.RaveRadar.models.Announcement;
-import com.project.RaveRadar.models.User;
 import com.project.RaveRadar.payloads.AnnouncementEdit;
 import com.project.RaveRadar.repositories.AnnouncementRepo;
 import com.project.RaveRadar.utils.AuthUtil;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.relational.core.sql.In;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
 import java.time.Instant;
 import java.util.UUID;
 
@@ -23,6 +24,18 @@ public class AnnouncementService {
     private final AnnouncementRepo announcementRepo;
     private final UserProfileService profileService;
     private final AuthUtil authUtil;
+
+    public ResponseEntity<AnnouncementDTO> getAnnouncement(UUID id){
+        Announcement announcement = announcementRepo.findById(id).orElseThrow(() -> new NotFoundException("Announcement was not found."));
+        return ResponseEntity.ok(new AnnouncementDTO(announcement));
+    }
+
+    public ResponseEntity<Page<AnnouncementDTO>> getAllAnnouncements(Pageable pageable){
+        Page<Announcement> announcementPage = announcementRepo.findAll(pageable);
+        Page<AnnouncementDTO> dtoPage = announcementPage.map(AnnouncementDTO::new);
+
+        return ResponseEntity.ok(dtoPage);
+    }
 
     @Transactional
     public ResponseEntity<AnnouncementDTO> createAnnouncement (Announcement announcement) {
@@ -36,7 +49,7 @@ public class AnnouncementService {
     }
 
     @Transactional
-    public ResponseEntity<?> deleteAnnouncement(UUID announcementId){
+    public ResponseEntity<String> deleteAnnouncement(UUID announcementId){
         authUtil.isUserAdmin();
         Announcement queriedAnnouncement = announcementRepo.findById(announcementId).orElseThrow(
                 () -> new NotFoundException("Announcement to be deleted was not found.")
@@ -53,14 +66,15 @@ public class AnnouncementService {
         if (queriedAnnouncement.getAnnouncer().getUser() != authUtil.getCurrentUser()){
             throw new ForbiddenException("This is not your announcement to edit");
         }
-
-
         if (edits.getHeader() != null){
             queriedAnnouncement.setHeader(edits.getHeader());
         }
         if (edits.getContent() != null){
             queriedAnnouncement.setContent(edits.getContent());
         }
-        return ResponseEntity.ok(new AnnouncementDTO(queriedAnnouncement));
+        queriedAnnouncement.setUpdatedAt(Instant.now());
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(new AnnouncementDTO(announcementRepo.save(queriedAnnouncement)));
     }
 }

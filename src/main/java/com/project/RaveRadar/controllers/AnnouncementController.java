@@ -1,6 +1,7 @@
 package com.project.RaveRadar.controllers;
 
 import com.project.RaveRadar.models.Announcement;
+import com.project.RaveRadar.payloads.AnnouncementEdit;
 import com.project.RaveRadar.services.AnnouncementService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,9 +22,17 @@ public class AnnouncementController {
         return announcementService.createAnnouncement(announcement);
     }
 
+
+
     @DeleteMapping("/{id}")
     @PreAuthorize("isAuthenticated() and hasRole('ADMIN')")
     public ResponseEntity<?> deleteAnnouncement(@PathVariable UUID id){
         return announcementService.deleteAnnouncement(id);
+    }
+
+    @PatchMapping("/{id}")
+    @PreAuthorize("isAuthenticated() and hasRole('ADMIN')")
+    public ResponseEntity<?> editAnnouncement(@PathVariable UUID id, @RequestBody AnnouncementEdit edit){
+        return announcementService.editAnnouncement(id, edit);
     }
 }

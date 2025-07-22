@@ -5,6 +5,7 @@ import com.project.RaveRadar.exceptions.ForbiddenException;
 import com.project.RaveRadar.exceptions.NotFoundException;
 import com.project.RaveRadar.models.Announcement;
 import com.project.RaveRadar.models.User;
+import com.project.RaveRadar.payloads.AnnouncementEdit;
 import com.project.RaveRadar.repositories.AnnouncementRepo;
 import com.project.RaveRadar.utils.AuthUtil;
 import jakarta.transaction.Transactional;
@@ -43,5 +44,23 @@ public class AnnouncementService {
         System.out.println(queriedAnnouncement);
         announcementRepo.delete(queriedAnnouncement);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @Transactional
+    public ResponseEntity<AnnouncementDTO> editAnnouncement(UUID id, AnnouncementEdit edits){
+        authUtil.isUserAdmin();
+        Announcement queriedAnnouncement = announcementRepo.findById(id).orElseThrow(() -> new NotFoundException("Announcement not found."));
+        if (queriedAnnouncement.getAnnouncer().getUser() != authUtil.getCurrentUser()){
+            throw new ForbiddenException("This is not your announcement to edit");
+        }
+
+
+        if (edits.getHeader() != null){
+            queriedAnnouncement.setHeader(edits.getHeader());
+        }
+        if (edits.getContent() != null){
+            queriedAnnouncement.setContent(edits.getContent());
+        }
+        return ResponseEntity.ok(new AnnouncementDTO(queriedAnnouncement));
     }
 }

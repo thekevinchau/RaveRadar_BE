@@ -87,6 +87,7 @@ public class UserProfileService {
         return personalDetailsRepository.save(details);
     }
 
+
     public ResponseEntity<UserProfileDTO> getUserProfile (UUID id){
         Optional<UserProfile> profile = profileRepository.findById(id);
         if (profile.isEmpty()){

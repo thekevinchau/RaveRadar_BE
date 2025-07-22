@@ -29,7 +29,7 @@ public class EventDTO {
     @AllArgsConstructor
     @NoArgsConstructor
     @Data
-    public static class EventDetails {
+    private static class EventDetails {
         private String eventName;
         private String description;
         private EventType eventType;
@@ -40,7 +40,7 @@ public class EventDTO {
     @AllArgsConstructor
     @NoArgsConstructor
     @Data
-    public static class ImageURLs{
+    private static class ImageURLs{
         private String bannerUrl;
         private String avatarUrl;
     }

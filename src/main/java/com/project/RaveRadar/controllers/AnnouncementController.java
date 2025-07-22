@@ -1,9 +1,14 @@
 package com.project.RaveRadar.controllers;
 
+import com.project.RaveRadar.DTO.AnnouncementDTO;
 import com.project.RaveRadar.models.Announcement;
 import com.project.RaveRadar.payloads.AnnouncementEdit;
 import com.project.RaveRadar.services.AnnouncementService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -22,11 +27,23 @@ public class AnnouncementController {
         return announcementService.createAnnouncement(announcement);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<AnnouncementDTO> getAnnouncementById(@PathVariable UUID id){
+        return announcementService.getAnnouncement(id);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<Page<AnnouncementDTO>> getAllAnnouncements(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt"));
+        return announcementService.getAllAnnouncements(pageable);
+    }
 
 
     @DeleteMapping("/{id}")
     @PreAuthorize("isAuthenticated() and hasRole('ADMIN')")
-    public ResponseEntity<?> deleteAnnouncement(@PathVariable UUID id){
+    public ResponseEntity<String> deleteAnnouncement(@PathVariable UUID id){
         return announcementService.deleteAnnouncement(id);
     }
 

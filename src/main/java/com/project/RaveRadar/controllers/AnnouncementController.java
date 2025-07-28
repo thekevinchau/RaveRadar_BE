@@ -1,7 +1,9 @@
 package com.project.RaveRadar.controllers;
 
 import com.project.RaveRadar.DTO.AnnouncementDTO;
+import com.project.RaveRadar.DTO.CommentDTO;
 import com.project.RaveRadar.models.Announcement;
+import com.project.RaveRadar.models.AnnouncementComment;
 import com.project.RaveRadar.payloads.AnnouncementEdit;
 import com.project.RaveRadar.services.AnnouncementService;
 import lombok.AllArgsConstructor;
@@ -13,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -27,6 +30,14 @@ public class AnnouncementController {
         return announcementService.createAnnouncement(announcement);
     }
 
+
+    @PostMapping("/{id}/comments")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<CommentDTO> commentOnAnnouncement(@PathVariable UUID id, @RequestBody AnnouncementService.CommentPayload payload){
+        return announcementService.createComment(id, payload);
+    }
+
+
     @GetMapping("/{id}")
     public ResponseEntity<AnnouncementDTO> getAnnouncementById(@PathVariable UUID id){
         return announcementService.getAnnouncement(id);
@@ -40,6 +51,10 @@ public class AnnouncementController {
         return announcementService.getAllAnnouncements(pageable);
     }
 
+    @GetMapping("/{id}/comments")
+    public ResponseEntity<List<CommentDTO>> getCommentsByAnnouncement(@PathVariable UUID id){
+        return announcementService.getAllCommentsByAnnouncement(id);
+    }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("isAuthenticated() and hasRole('ADMIN')")

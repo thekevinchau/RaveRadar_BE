@@ -39,7 +39,7 @@ public class UserProfileService {
         return user.getId().equals(profile.getUser().getId());
     }
 
-    public UserProfile getMyProfile(){
+    public UserProfile getPrincipalProfile(){
         return profileRepository.findByUser(authUtil.getCurrentUser()).orElseThrow(() -> new NotFoundException("User not found"));
     }
 
@@ -213,7 +213,7 @@ public class UserProfileService {
 
     @Transactional
     public ResponseEntity<UserProfileDTO> favoriteEvent(UUID eventId){
-        UserProfile profile = getMyProfile();
+        UserProfile profile = getPrincipalProfile();
         Set<Event> favoriteEvents = profile.getFavoriteEvents();
         favoriteEvents.add(eventService.getEventObj(eventId));
         return ResponseEntity.ok(new UserProfileDTO(profileRepository.save(profile)));

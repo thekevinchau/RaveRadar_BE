@@ -10,6 +10,7 @@ import com.project.RaveRadar.utils.AuthUtil;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -18,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -33,6 +35,11 @@ public class EventService {
         return (value == null || value.trim().isEmpty()) ? null : value;
     }
 
+    public ResponseEntity<List<EventDTO>> getFutureEvents(int pageNo, int pageSize){
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        return ResponseEntity.ok(eventRepository.findAllFutureEvents(Instant.now(), pageable).getContent().stream().map(EventDTO::new).toList());
+
+    }
 
     protected Event getEventObj(UUID eventId){
         return eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event does not exist!"));

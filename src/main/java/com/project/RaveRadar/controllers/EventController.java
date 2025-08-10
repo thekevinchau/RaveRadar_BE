@@ -15,6 +15,7 @@ import java.util.UUID;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/events")
+@CrossOrigin("*")
 public class EventController {
     private final EventService eventService;
 
@@ -27,7 +28,11 @@ public class EventController {
     @GetMapping("")
     public ResponseEntity<List<EventDTO>> getAllEvents(
             @RequestParam (defaultValue = "0") int page,
-            @RequestParam (defaultValue = "10") int size){
+            @RequestParam (defaultValue = "10") int size,
+            @RequestParam(required = false) boolean future){
+        if (future){
+            return eventService.getFutureEvents(page,size);
+        }
         return eventService.getAllEvents(page,size);
     }
 

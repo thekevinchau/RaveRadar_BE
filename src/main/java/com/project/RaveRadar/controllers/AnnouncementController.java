@@ -21,6 +21,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/announcements")
 @AllArgsConstructor
+@CrossOrigin("*")
 public class AnnouncementController {
     private final AnnouncementService announcementService;
 
@@ -46,8 +47,9 @@ public class AnnouncementController {
     @GetMapping("/all")
     public ResponseEntity<Page<AnnouncementDTO>> getAllAnnouncements(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt"));
+            @RequestParam(defaultValue = "10") int size)
+    {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         return announcementService.getAllAnnouncements(pageable);
     }
 

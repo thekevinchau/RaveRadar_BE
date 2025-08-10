@@ -19,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,13 +36,13 @@ public class AnnouncementService {
 
     public ResponseEntity<AnnouncementDTO> getAnnouncement(UUID id){
         Announcement announcement = announcementRepo.findById(id).orElseThrow(() -> new NotFoundException("Announcement was not found."));
-        return ResponseEntity.ok(new AnnouncementDTO(announcement));
+        AnnouncementDTO dto = new AnnouncementDTO(announcement);
+        return ResponseEntity.ok(dto);
     }
 
     public ResponseEntity<Page<AnnouncementDTO>> getAllAnnouncements(Pageable pageable){
         Page<Announcement> announcementPage = announcementRepo.findAll(pageable);
         Page<AnnouncementDTO> dtoPage = announcementPage.map(AnnouncementDTO::new);
-
         return ResponseEntity.ok(dtoPage);
     }
 
@@ -84,7 +83,7 @@ public class AnnouncementService {
         }
         queriedAnnouncement.setUpdatedAt(Instant.now());
         return ResponseEntity
-                .status(HttpStatus.CREATED)
+                .status(HttpStatus.OK)
                 .body(new AnnouncementDTO(announcementRepo.save(queriedAnnouncement)));
     }
 
@@ -101,7 +100,7 @@ public class AnnouncementService {
         comment.setCommenter(profileService.getPrincipalProfile());
         comment.setContent(payload.getContent());
         comment.setCreatedAt(Instant.now());
-        return ResponseEntity.ok(new CommentDTO(commentRepo.save(comment)));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new CommentDTO(commentRepo.save(comment)));
     }
 
     public ResponseEntity<List<CommentDTO>> getAllCommentsByAnnouncement(UUID announcementId){

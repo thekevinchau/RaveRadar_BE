@@ -3,7 +3,10 @@ package com.project.RaveRadar.controllers;
 import com.project.RaveRadar.models.User;
 import com.project.RaveRadar.payloads.UserRegPayload;
 import com.project.RaveRadar.services.UserService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

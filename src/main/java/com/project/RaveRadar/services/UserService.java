@@ -6,8 +6,10 @@ import com.project.RaveRadar.models.UserProfile;
 import com.project.RaveRadar.payloads.UserRegPayload;
 import com.project.RaveRadar.repositories.UserRepository;
 import com.project.RaveRadar.security.JwtUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -65,5 +68,28 @@ public class UserService {
 
         String jwtToken = jwtUtil.generateToken((org.springframework.security.core.userdetails.User) authentication.getPrincipal());
         return ResponseEntity.ok(jwtToken);
+    }
+
+    public ResponseEntity<?> cookieLogin(User user, HttpServletResponse response){
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+                user.getEmail(),
+                user.getPassword()
+        );
+
+        Authentication authentication = manager.authenticate(token);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        String jwt = jwtUtil.generateToken((org.springframework.security.core.userdetails.User) authentication.getPrincipal());
+        ResponseCookie cookie = ResponseCookie.from("jwt", jwt)
+                .httpOnly(true)
+                .secure(false) // true if on HTTPS in prod
+                .path("/")
+                .maxAge(24 * 60 * 60)
+                .sameSite("Lax")
+                .build();
+
+        response.addHeader("Set-Cookie", cookie.toString());
+
+        return ResponseEntity.ok(Map.of("message", "Logged in"));
     }
 }

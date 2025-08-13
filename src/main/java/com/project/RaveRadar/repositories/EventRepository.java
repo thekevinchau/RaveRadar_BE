@@ -16,4 +16,7 @@ import java.util.UUID;
 public interface EventRepository extends JpaRepository<Event, UUID> {
     @Query("SELECT e FROM Event e WHERE e.startDate >= :date ORDER BY e.startDate ASC")
     Page<Event> findAllFutureEvents(@Param("date") Instant date, Pageable pageable);
+
+    @Query("SELECT e from Event e WHERE e.startDate <= :date ORDER BY e.startDate ASC")
+    Page<Event> findPastEvents(@Param("date") Instant date, Pageable pageable);
 }

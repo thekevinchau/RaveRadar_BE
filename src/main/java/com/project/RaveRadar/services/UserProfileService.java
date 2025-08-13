@@ -88,6 +88,15 @@ public class UserProfileService {
     }
 
 
+    public ResponseEntity<UserProfileDTO> getMyProfile(){
+        UserProfile profile = getPrincipalProfile();
+        UserProfileDTO profileDTO = new UserProfileDTO(profile);
+        Set<UserProfileLink> externalLinks = new HashSet<>(profileLinkRepository.findByUserProfile(profile));
+        profileDTO.setExternalLinks(externalLinks.stream().map(ProfileExternalLinkDTO::new).collect(Collectors.toSet()));
+        return ResponseEntity.ok(profileDTO);
+    }
+
+
     public ResponseEntity<UserProfileDTO> getUserProfile (UUID id){
         Optional<UserProfile> profile = profileRepository.findById(id);
         if (profile.isEmpty()){
@@ -218,13 +227,4 @@ public class UserProfileService {
         favoriteEvents.add(eventService.getEventObj(eventId));
         return ResponseEntity.ok(new UserProfileDTO(profileRepository.save(profile)));
     }
-
-    /*
-    @Transactional
-    public ResponseEntity<UserProfileDTO> unfavoriteEvent(UUID eventId){
-        UserProfile profile = getMyProfile();
-        Set<Event>
-    }
-
-     */
 }

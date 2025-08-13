@@ -1,5 +1,6 @@
 package com.project.RaveRadar.services;
 
+import com.project.RaveRadar.DTO.UserProfileDTO;
 import com.project.RaveRadar.exceptions.NotFoundException;
 import com.project.RaveRadar.models.User;
 import com.project.RaveRadar.models.UserProfile;
@@ -56,20 +57,6 @@ public class UserService {
         return ResponseEntity.ok("user already exists!");
     }
 
-
-    public ResponseEntity<String> login(User user){
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                user.getEmail(),
-                user.getPassword()
-        );
-
-        Authentication authentication = manager.authenticate(token);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        String jwtToken = jwtUtil.generateToken((org.springframework.security.core.userdetails.User) authentication.getPrincipal());
-        return ResponseEntity.ok(jwtToken);
-    }
-
     public ResponseEntity<?> cookieLogin(User user, HttpServletResponse response){
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
                 user.getEmail(),
@@ -90,6 +77,6 @@ public class UserService {
 
         response.addHeader("Set-Cookie", cookie.toString());
 
-        return ResponseEntity.ok(Map.of("message", "Logged in"));
+        return profileService.getMyProfile();
     }
 }

@@ -28,11 +28,14 @@ public class EventController {
     public ResponseEntity<List<EventDTO>> getAllEvents(
             @RequestParam (defaultValue = "0") int page,
             @RequestParam (defaultValue = "10") int size,
-            @RequestParam(required = false, defaultValue = "false") boolean future){
-        if (future){
+            @RequestParam(required = false) boolean isFuture){
+        System.out.println(isFuture);
+        if (isFuture){
             return eventService.getFutureEvents(page,size);
         }
-        return eventService.getAllEvents(page,size);
+        else{
+            return eventService.getPastEvents(page, size);
+        }
     }
 
     @GetMapping("/{id}")

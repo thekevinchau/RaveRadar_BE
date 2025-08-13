@@ -40,6 +40,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User user, HttpServletResponse response) {
+        System.out.println("i've been called");
         return userService.cookieLogin(user, response);
     }
 

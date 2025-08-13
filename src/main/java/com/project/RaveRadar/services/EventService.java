@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -35,18 +36,29 @@ public class EventService {
         return (value == null || value.trim().isEmpty()) ? null : value;
     }
 
-    public ResponseEntity<List<EventDTO>> getFutureEvents(int pageNo, int pageSize){
-        Pageable pageable = PageRequest.of(pageNo, pageSize);
-        return ResponseEntity.ok(eventRepository.findAllFutureEvents(Instant.now(), pageable).getContent().stream().map(EventDTO::new).toList());
-
-    }
-
     protected Event getEventObj(UUID eventId){
         return eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event does not exist!"));
     }
 
     public ResponseEntity<EventDTO> getEvent (UUID eventId){
         return ResponseEntity.ok(new EventDTO(getEventObj(eventId)));
+    }
+
+    public ResponseEntity<List<EventDTO>> getFutureEvents(int pageNo, int pageSize){
+        Instant todayStart = LocalDate.now(ZoneOffset.UTC) // or your desired zone
+                .atStartOfDay()
+                .toInstant(ZoneOffset.UTC);
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        return ResponseEntity.ok(eventRepository.findAllFutureEvents(todayStart, pageable).getContent().stream().map(EventDTO::new).toList());
+
+    }
+
+    public ResponseEntity<List<EventDTO>> getPastEvents(int pageNo, int pageSize){
+        Instant todayStart = LocalDate.now(ZoneOffset.UTC) // or your desired zone
+                .atStartOfDay()
+                .toInstant(ZoneOffset.UTC);
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        return ResponseEntity.ok(eventRepository.findPastEvents(todayStart, pageable).getContent().stream().map(EventDTO::new).toList());
     }
 
 

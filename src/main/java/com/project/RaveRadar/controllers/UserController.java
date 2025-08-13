@@ -28,6 +28,11 @@ public class UserController {
         return profileService.addProfileExternalLink(id, edits.getExternalLinks());
     }
 
+    @GetMapping("/profiles/me")
+    public ResponseEntity<UserProfileDTO> getMyProfile(){
+        return profileService.getMyProfile();
+    }
+
     @GetMapping("/profiles/{id}")
     public ResponseEntity<UserProfileDTO> getUserProfile(@PathVariable UUID id){
         return profileService.getUserProfile(id);

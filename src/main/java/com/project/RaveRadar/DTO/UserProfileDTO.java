@@ -1,34 +1,53 @@
 package com.project.RaveRadar.DTO;
 
+import com.project.RaveRadar.models.Event;
 import com.project.RaveRadar.models.UserProfile;
+import com.project.RaveRadar.models.UserProfileLink;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Data
 public class UserProfileDTO {
-    private String name;
-    private String username;
+    private UUID id;
+    private String displayName;
+    private String gender;
     private String bio;
-    private String avatarPath;
-    private String pronouns;
-    private Set<SimpleArtistDTO> favoriteArtists;
-    private Set<SimpleEventDTO> eventHistory;
+    private String avatarUrl;
+    PersonalDetailsDTO personalDetailsDTO;
+    Set<ProfileExternalLinkDTO> externalLinks;
+    Set<FavoriteEvent> favoriteEvents;
+    private Instant createdAt;
+    private Instant updatedAt;
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class FavoriteEvent {
+        private UUID id;
+        private String name;
+
+        public FavoriteEvent(Event event) {
+            this.id = event.getId();
+            this.name = event.getEventName();
+        }
+    }
 
     public UserProfileDTO (UserProfile profile){
-        this.name = profile.getName();
-        this.username = profile.getUsername();
+        this.id = profile.getId();
+        this.displayName = profile.getDisplayName();
+        this.gender = profile.getGender();
         this.bio = profile.getBio();
-        this.avatarPath = profile.getAvatarPath();
-        this.pronouns = profile.getPronouns();
-        this.favoriteArtists = profile.getFavoriteArtists()
-                .stream()
-                .map(SimpleArtistDTO::new)
-                .collect(Collectors.toSet());
-        this.eventHistory = profile.getEventHistory()
-                .stream()
-                .map(SimpleEventDTO::new)
-                .collect(Collectors.toSet());
+        this.avatarUrl = profile.getAvatarUrl();
+        this.createdAt = profile.getCreatedAt();
+        this.updatedAt = profile.getUpdatedAt();
+        this.favoriteEvents = profile.getFavoriteEvents().stream().map(FavoriteEvent::new).collect(Collectors.toSet());
+        this.personalDetailsDTO = new PersonalDetailsDTO(profile.getPersonalDetails());
     }
 }

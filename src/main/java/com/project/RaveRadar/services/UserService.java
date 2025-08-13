@@ -1,12 +1,16 @@
 package com.project.RaveRadar.services;
 
+import com.project.RaveRadar.DTO.UserProfileDTO;
 import com.project.RaveRadar.exceptions.NotFoundException;
 import com.project.RaveRadar.models.User;
+import com.project.RaveRadar.models.UserProfile;
 import com.project.RaveRadar.payloads.UserRegPayload;
 import com.project.RaveRadar.repositories.UserRepository;
 import com.project.RaveRadar.security.JwtUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,6 +19,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -26,13 +32,13 @@ public class UserService {
     private JwtUtil jwtUtil;
 
     private final UserRepository userRepository;
-    private final UserProfileService userProfileService;
+    private final UserProfileService profileService;
 
-    public UserService(PasswordEncoder passwordEncoder, AuthenticationManager manager, UserRepository userRepository, UserProfileService userProfileService) {
+    public UserService(PasswordEncoder passwordEncoder, AuthenticationManager manager, UserRepository userRepository, UserProfileService profileService) {
         this.passwordEncoder = passwordEncoder;
         this.manager = manager;
         this.userRepository = userRepository;
-        this.userProfileService = userProfileService;
+        this.profileService = profileService;
     }
 
     @Transactional
@@ -45,14 +51,13 @@ public class UserService {
             newUser.setPassword(passwordEncoder.encode(currentPassword));
             newUser.setRole("ROLE_USER");
             User savedUser = userRepository.save(newUser);
-            userProfileService.createUserProfile(savedUser, payload.getUsername());
+            UserProfile newProfile = profileService.createUserProfile(savedUser, payload.getDisplayName(), LocalDate.parse(payload.getBirthday()), payload.getPhoneNumber());
             return ResponseEntity.ok("Success");
         }
         return ResponseEntity.ok("user already exists!");
     }
 
-
-    public ResponseEntity<String> login(User user){
+    public ResponseEntity<?> cookieLogin(User user, HttpServletResponse response){
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
                 user.getEmail(),
                 user.getPassword()
@@ -61,7 +66,17 @@ public class UserService {
         Authentication authentication = manager.authenticate(token);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        String jwtToken = jwtUtil.generateToken((org.springframework.security.core.userdetails.User) authentication.getPrincipal());
-        return ResponseEntity.ok(jwtToken);
+        String jwt = jwtUtil.generateToken((org.springframework.security.core.userdetails.User) authentication.getPrincipal());
+        ResponseCookie cookie = ResponseCookie.from("jwt", jwt)
+                .httpOnly(true)
+                .secure(false) // true if on HTTPS in prod
+                .path("/")
+                .maxAge(24 * 60 * 60)
+                .sameSite("Lax")
+                .build();
+
+        response.addHeader("Set-Cookie", cookie.toString());
+
+        return profileService.getMyProfile();
     }
 }

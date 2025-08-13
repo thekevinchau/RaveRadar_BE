@@ -1,13 +1,11 @@
 package com.project.RaveRadar.utils;
 
+import com.project.RaveRadar.exceptions.ForbiddenException;
 import com.project.RaveRadar.exceptions.NotFoundException;
 import com.project.RaveRadar.models.User;
 import com.project.RaveRadar.repositories.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -29,5 +27,11 @@ public class AuthUtil {
             throw new NotFoundException("User does not exist.");
         }
         return userOptional.get();
+    }
+    public void isUserAdmin(){
+        User currentUser = getCurrentUser();
+        if (!currentUser.getRole().equals("ROLE_ADMIN")){
+            throw new ForbiddenException("You are not authorized to make an announcement.");
+        }
     }
 }

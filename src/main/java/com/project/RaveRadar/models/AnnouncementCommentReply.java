@@ -1,49 +1,41 @@
 package com.project.RaveRadar.models;
-
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "addresses")
+@Table(name = "announcement_comments_replies")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Address {
+public class AnnouncementCommentReply {
 
     @Id
     @GeneratedValue
     @Column(columnDefinition = "uuid", updatable = false, nullable = false)
     private UUID id;
 
-    @Column(name = "venue_name")
-    private String venueName;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "comment_id", nullable = false)
+    private AnnouncementComment comment;
 
-    @Column(nullable = false)
-    private String street;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "commenter_id")
+    private UserProfile commenter;
 
-    @Column(nullable = false)
-    private String city;
-
-    @Column(nullable = false)
-    private String state;
-
-    @Column(nullable = false)
-    private String zip;
-
-    @Column(nullable = false)
-    private String country;
+    @Column(columnDefinition = "TEXT")
+    private String content;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
 }

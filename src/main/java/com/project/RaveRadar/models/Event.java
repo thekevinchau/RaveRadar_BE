@@ -1,80 +1,64 @@
 package com.project.RaveRadar.models;
 
-import com.project.RaveRadar.enums.AgeRestriction;
-import com.project.RaveRadar.enums.EdmGenre;
 import com.project.RaveRadar.enums.EventType;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.ZonedDateTime;
-import java.util.Set;
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "event")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Table(name = "event")
 public class Event {
 
     @Id
-    @GeneratedValue
-    @Column(name = "event_id", columnDefinition = "uuid", updatable = false, nullable = false)
-    private UUID eventId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
-    @Column(name = "name", nullable = false, length = 255)
-    private String name;
+    @Column(name = "event_name", nullable = false, unique = true)
+    private String eventName;
 
-    @Column(name = "description", columnDefinition = "text")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "start_date", nullable = false)
-    private ZonedDateTime startDate;
-
-    @Column(name = "end_date", nullable = false)
-    private ZonedDateTime endDate;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "address")
-    private Address address;
-
     @Enumerated(EnumType.STRING)
-    @Column(name = "event_type", length = 255)
+    @Column(name = "event_type", nullable = false)
     private EventType eventType;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "genre", length = 255)
-    private EdmGenre genre;
+    @Column(name = "banner_url")
+    private String bannerUrl;
 
-    @Column(name = "external_link", columnDefinition = "text")
-    private String externalLink;
+    @Column(name = "avatar_url")
+    private String avatarUrl;
 
-    @Column(name = "image_path", columnDefinition = "text")
-    private String imagePath;
+    @Column(name = "address", nullable = false)
+    private String address;
 
-    @Column(name = "support_email")
-    private String supportEmail;
+    @Column(name = "city", length = 255, nullable = false)
+    private String city;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "age_restriction", length = 255)
-    private AgeRestriction ageRestriction;
+    @Column(name = "state", length = 2, nullable = false)
+    private String state;
 
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private ZonedDateTime createdAt;
+    @Column(name = "zipcode", nullable = false)
+    private String zipcode;
 
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private ZonedDateTime updatedAt;
+    @Column(name = "venue_name")
+    private String venueName;
 
-    @ManyToMany
-    @JoinTable(
-            name = "artist_events",
-            joinColumns = @JoinColumn(name = "event_id"),
-            inverseJoinColumns = @JoinColumn(name = "artist_id")
-    )
-    private Set<Artist> attendingArtists;
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt = Instant.now();
+
+    @Column(name = "updated_at", nullable = false, updatable = false)
+    private Instant updatedAt = Instant.now();
+
+    @Column(name = "start_date", nullable = false)
+    private Instant startDate;
+
+    @Column(name = "end_date")
+    private Instant endDate;
+
 }

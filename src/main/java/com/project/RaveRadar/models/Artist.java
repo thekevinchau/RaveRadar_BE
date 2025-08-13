@@ -11,40 +11,31 @@ import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Table(name = "artist")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "artist")
 public class Artist {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @Column(name = "artist_name", nullable = false)
+    private String artistName;
+
     @Column(name = "stage_name", nullable = false)
     private String stageName;
 
-    @Column(name = "real_name", nullable = false)
-    private String realName;
+    @Column(name = "avatar_path")
+    private String avatarPath;
 
-    @Column(columnDefinition = "TEXT")
-    private String bio;
+    @Column(name = "banner_path")
+    private String bannerPath;
 
-    @Column(name = "avatar_url")
-    private String avatarUrl;
+    @Column(name = "musicbrainz_id", unique = true)
+    private UUID musicbrainzId;
 
-    private String country;
-
-    private String hometown;
-
-    @Column(name = "is_verified", nullable = false)
-    private boolean isVerified;
-
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    @Column(name = "about", columnDefinition = "TEXT")
+    private String about;
 }

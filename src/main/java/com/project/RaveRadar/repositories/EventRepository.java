@@ -3,35 +3,20 @@ package com.project.RaveRadar.repositories;
 import com.project.RaveRadar.models.Event;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Repository
 public interface EventRepository extends JpaRepository<Event, UUID> {
-    //Get all events by date paginated
-    Page<Event> findAllByOrderByStartDateAsc(Pageable pageable);
+    @Query("SELECT e FROM Event e WHERE e.startDate >= :date ORDER BY e.startDate ASC")
+    Page<Event> findAllFutureEvents(@Param("date") Instant date, Pageable pageable);
 
-    Page<Event> findAll(Specification<Event> spec, Pageable pageable);
-
-    Optional<Event> findByName(String name);
-    //Get all events close to a particular user
-
-    //Get all events close to where user is
-
-    //Get events by searchbar
-
-    //Get all events based on users' current location
-
-    /*
-    Get all events based on certain criteria:
-        - location
-        - sorted (ascending or descending)
-        - artist attendance
-        - is it a festival?
-     */
+    @Query("SELECT e from Event e WHERE e.startDate <= :date ORDER BY e.startDate ASC")
+    Page<Event> findPastEvents(@Param("date") Instant date, Pageable pageable);
 }

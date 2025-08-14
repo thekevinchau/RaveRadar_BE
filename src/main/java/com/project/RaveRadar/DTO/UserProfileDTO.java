@@ -20,6 +20,7 @@ public class UserProfileDTO {
     private String gender;
     private String bio;
     private String avatarUrl;
+    private boolean isAdmin;
     PersonalDetailsDTO personalDetailsDTO;
     Set<ProfileExternalLinkDTO> externalLinks;
     Set<FavoriteEvent> favoriteEvents;

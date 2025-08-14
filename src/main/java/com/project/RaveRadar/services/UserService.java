@@ -1,7 +1,9 @@
 package com.project.RaveRadar.services;
 
 import com.project.RaveRadar.DTO.UserProfileDTO;
+import com.project.RaveRadar.exceptions.ForbiddenException;
 import com.project.RaveRadar.exceptions.NotFoundException;
+import com.project.RaveRadar.exceptions.ResourceAlreadyExistsException;
 import com.project.RaveRadar.models.User;
 import com.project.RaveRadar.models.UserProfile;
 import com.project.RaveRadar.payloads.UserRegPayload;
@@ -15,11 +17,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -42,7 +48,7 @@ public class UserService {
     }
 
     @Transactional
-    public ResponseEntity<String> register(UserRegPayload payload){
+    public ResponseEntity<UserProfileDTO> register(UserRegPayload payload){
         Optional<User> userOptional = userRepository.findByEmail(payload.getEmail());
         if (userOptional.isEmpty()){
             User newUser = new User();
@@ -52,12 +58,12 @@ public class UserService {
             newUser.setRole("ROLE_USER");
             User savedUser = userRepository.save(newUser);
             UserProfile newProfile = profileService.createUserProfile(savedUser, payload.getDisplayName(), LocalDate.parse(payload.getBirthday()), payload.getPhoneNumber());
-            return ResponseEntity.ok("Success");
+            return ResponseEntity.ok(new UserProfileDTO(newProfile));
         }
-        return ResponseEntity.ok("user already exists!");
+        throw new ResourceAlreadyExistsException("A user with that email already exists!");
     }
 
-    public ResponseEntity<?> cookieLogin(User user, HttpServletResponse response){
+    public ResponseEntity<UserProfileDTO> cookieLogin(User user, HttpServletResponse response){
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
                 user.getEmail(),
                 user.getPassword()
@@ -76,7 +82,25 @@ public class UserService {
                 .build();
 
         response.addHeader("Set-Cookie", cookie.toString());
+        UserProfileDTO dto = profileService.getMyProfile().getBody();
+        dto.setAdmin(isUserAdmin(authentication));
+        return ResponseEntity.ok(dto);
+    }
+    public Boolean isUserAdmin(Authentication authentication) {
+        // The principal contains the authenticated user
+        if (authentication == null){
+            throw new ForbiddenException("You are not currently logged in!");
+        }
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-        return profileService.getMyProfile();
+
+        // Get roles as strings
+        List<String> roles = userDetails.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+
+        System.out.println(roles);
+        return roles.contains("ROLE_ADMIN");
     }
 }

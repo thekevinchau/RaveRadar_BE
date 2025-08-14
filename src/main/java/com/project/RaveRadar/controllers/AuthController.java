@@ -1,5 +1,7 @@
 package com.project.RaveRadar.controllers;
 
+import com.project.RaveRadar.DTO.UserProfileDTO;
+import com.project.RaveRadar.exceptions.ForbiddenException;
 import com.project.RaveRadar.models.User;
 import com.project.RaveRadar.payloads.UserRegPayload;
 import com.project.RaveRadar.security.JwtUtil;
@@ -9,17 +11,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 import lombok.AllArgsConstructor;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -30,17 +29,8 @@ public class AuthController {
     private final JwtUtil jwtUtil;
     private final AuthenticationManager manager;
 
-    /*
-    @PostMapping("/login")
-    public ResponseEntity<String> login (@RequestBody User user){
-        return userService.login(user);
-    }
-
-     */
-
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User user, HttpServletResponse response) {
-        System.out.println("i've been called");
         return userService.cookieLogin(user, response);
     }
 
@@ -57,7 +47,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody @Valid UserRegPayload payload){
+    public ResponseEntity<UserProfileDTO> register(@RequestBody @Valid UserRegPayload payload){
         return userService.register(payload);
     }
 }

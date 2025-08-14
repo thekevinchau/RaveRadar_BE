@@ -68,4 +68,10 @@ public class AnnouncementController {
     public ResponseEntity<?> editAnnouncement(@PathVariable UUID id, @RequestBody AnnouncementEdit edit){
         return announcementService.editAnnouncement(id, edit);
     }
+
+    @DeleteMapping("/comments/{commentId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> deleteComment(@PathVariable UUID commentId){
+        return announcementService.deleteComment(commentId);
+    }
 }

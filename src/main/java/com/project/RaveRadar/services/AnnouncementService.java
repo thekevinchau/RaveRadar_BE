@@ -103,6 +103,21 @@ public class AnnouncementService {
         return ResponseEntity.status(HttpStatus.CREATED).body(new CommentDTO(commentRepo.save(comment)));
     }
 
+    @Transactional
+    public ResponseEntity<?> deleteComment(UUID commentId){
+        UUID ownerId = profileService.getPrincipalProfile().getId();
+        AnnouncementComment comment = commentRepo.findById(commentId).orElseThrow(() -> new NotFoundException("Comment to be deleted does not exist!"));
+
+        if (ownerId == comment.getCommenter().getId()){
+            commentRepo.delete(comment);
+        }
+        else{
+            throw new ForbiddenException("You are not allowed to delete this comment!");
+        }
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
     public ResponseEntity<List<CommentDTO>> getAllCommentsByAnnouncement(UUID announcementId){
         return ResponseEntity.ok(commentRepo.findAllByAnnouncementId(announcementId).stream().map(CommentDTO::new).toList());
     }

@@ -30,14 +30,6 @@ public class AuthController {
     private final JwtUtil jwtUtil;
     private final AuthenticationManager manager;
 
-    /*
-    @PostMapping("/login")
-    public ResponseEntity<String> login (@RequestBody User user){
-        return userService.login(user);
-    }
-
-     */
-
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User user, HttpServletResponse response) {
         System.out.println("i've been called");

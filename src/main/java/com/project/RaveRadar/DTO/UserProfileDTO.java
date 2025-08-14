@@ -32,10 +32,14 @@ public class UserProfileDTO {
     public static class FavoriteEvent {
         private UUID id;
         private String name;
+        private Instant startDate;
+        private Instant endDate;
 
         public FavoriteEvent(Event event) {
             this.id = event.getId();
             this.name = event.getEventName();
+            this.startDate = event.getStartDate();
+            this.endDate = event.getEndDate();
         }
     }
 

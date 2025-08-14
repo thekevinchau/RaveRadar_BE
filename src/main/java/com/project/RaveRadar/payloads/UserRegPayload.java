@@ -33,6 +33,7 @@ public class UserRegPayload {
     @NotNull
     private String birthday;
 
+
     private String phoneNumber;
 }
 

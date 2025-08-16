@@ -70,7 +70,7 @@ public class AnnouncementController {
     }
 
     @DeleteMapping("/comments/{commentId}")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("isAuthenticated() or hasRole('ADMIN')")
     public ResponseEntity<?> deleteComment(@PathVariable UUID commentId){
         return announcementService.deleteComment(commentId);
     }

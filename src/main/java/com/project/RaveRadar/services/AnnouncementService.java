@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.List;
@@ -107,8 +108,8 @@ public class AnnouncementService {
     public ResponseEntity<?> deleteComment(UUID commentId){
         UUID ownerId = profileService.getPrincipalProfile().getId();
         AnnouncementComment comment = commentRepo.findById(commentId).orElseThrow(() -> new NotFoundException("Comment to be deleted does not exist!"));
-
-        if (ownerId == comment.getCommenter().getId()){
+        String role = authUtil.getCurrentUser().getRole();
+        if (ownerId == comment.getCommenter().getId() || role.equals("ROLE_ADMIN")){
             commentRepo.delete(comment);
         }
         else{

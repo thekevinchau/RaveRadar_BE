@@ -1,6 +1,7 @@
 package com.project.RaveRadar.services;
 
 
+import com.project.RaveRadar.DTO.EventDTO;
 import com.project.RaveRadar.DTO.ProfileExternalLinkDTO;
 import com.project.RaveRadar.DTO.UserProfileDTO;
 import com.project.RaveRadar.enums.Gender;
@@ -118,6 +119,12 @@ public class UserProfileService {
         }
     }
 
+    public ResponseEntity<Set<EventDTO>> getFavoriteEvents(UUID id){
+        UserProfile profile = profileRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found."));
+        Set<EventDTO> userFavoriteEvents = profile.getFavoriteEvents().stream().map(EventDTO::new).collect(Collectors.toSet());
+        return ResponseEntity.ok(userFavoriteEvents);
+    }
+
     @Transactional
     public UserProfile createUserProfile (User user, String displayName, LocalDate birthday, String phoneNumber){
         UserProfile newProfile = new UserProfile();
@@ -221,10 +228,20 @@ public class UserProfileService {
     }
 
     @Transactional
-    public ResponseEntity<UserProfileDTO> favoriteEvent(UUID eventId){
+    public ResponseEntity<?> favoriteEvent(UUID eventId){
         UserProfile profile = getPrincipalProfile();
         Set<Event> favoriteEvents = profile.getFavoriteEvents();
         favoriteEvents.add(eventService.getEventObj(eventId));
-        return ResponseEntity.ok(new UserProfileDTO(profileRepository.save(profile)));
+        profileRepository.save(profile);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @Transactional
+    public ResponseEntity<?> unfavoriteEvent(UUID eventId){
+        UserProfile profile = getPrincipalProfile();
+        Set<Event> favoriteEvents = profile.getFavoriteEvents();
+        favoriteEvents.remove(eventService.getEventObj(eventId));
+        profileRepository.save(profile);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

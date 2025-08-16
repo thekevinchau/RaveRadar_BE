@@ -1,6 +1,8 @@
 package com.project.RaveRadar.controllers;
 
+import com.project.RaveRadar.DTO.EventDTO;
 import com.project.RaveRadar.DTO.UserProfileDTO;
+import com.project.RaveRadar.models.Event;
 import com.project.RaveRadar.models.User;
 import com.project.RaveRadar.models.UserProfile;
 import com.project.RaveRadar.payloads.UserProfileEdit;
@@ -14,43 +16,54 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Set;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/profiles")
 @AllArgsConstructor
 public class UserController {
     private final UserService userService;
     private final UserProfileService profileService;
 
-    @PostMapping("/profiles/links/{id}")
+    @PostMapping("/links/{id}")
     public ResponseEntity<UserProfileDTO> addExternalLinks(@PathVariable UUID id, @RequestBody UserProfileEdit edits){
         return profileService.addProfileExternalLink(id, edits.getExternalLinks());
     }
 
-    @GetMapping("/profiles/me")
+    @GetMapping("/me")
     public ResponseEntity<UserProfileDTO> getMyProfile(){
         return profileService.getMyProfile();
     }
 
-    @GetMapping("/profiles/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<UserProfileDTO> getUserProfile(@PathVariable UUID id){
         return profileService.getUserProfile(id);
     }
-    @PatchMapping("/profiles/{id}")
+    @GetMapping("/favorite-events/{id}")
+    public ResponseEntity<Set<EventDTO>> getFavoriteEvents(@PathVariable UUID id){
+        return profileService.getFavoriteEvents(id);
+    }
+
+    @PatchMapping("/{id}")
     public ResponseEntity<UserProfileDTO> editUserProfile(@PathVariable UUID id, @RequestBody UserProfileEdit edits){
         return profileService.editUserProfile(id, edits);
     }
-    @PatchMapping("/profiles/links/{id}")
+    @PatchMapping("/links/{id}")
     public ResponseEntity<UserProfileDTO> editExternalLinks(@PathVariable UUID id, @RequestBody UserProfileEdit edits){
         return profileService.editProfileExternalLinks(id, edits.getExternalLinks());
     }
-    @PatchMapping("/profiles/favorite-events/{id}")
-    public ResponseEntity<UserProfileDTO> favoriteEvent(@PathVariable UUID id){
+    @PostMapping("/favorite-events/{id}")
+    public ResponseEntity<?> favoriteEvent(@PathVariable UUID id){
         return profileService.favoriteEvent(id);
     }
 
-    @DeleteMapping("/profiles/links/{profileId}/{linkId}")
+    @DeleteMapping("/favorite-events/{eventId}")
+    public ResponseEntity<?> unfavoriteEvent(@PathVariable UUID eventId){
+        return profileService.unfavoriteEvent(eventId);
+    }
+
+    @DeleteMapping("/links/{profileId}/{linkId}")
     public ResponseEntity<String> deleteExternalLink(@PathVariable UUID profileId, @PathVariable UUID linkId){
         return profileService.deleteProfileExternalLink(profileId, linkId);
     }

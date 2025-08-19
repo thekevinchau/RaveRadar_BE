@@ -14,6 +14,6 @@ public class ProfileExternalLinkDTO {
     public ProfileExternalLinkDTO(UserProfileLink externalLink){
         this.id = externalLink.getId();
         this.platform = String.valueOf(externalLink.getPlatform());
-        this.link = externalLink.getExternalLink();
+        this.link = externalLink.getLink();
     }
 }

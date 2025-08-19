@@ -5,10 +5,7 @@ import com.project.RaveRadar.enums.Gender;
 import com.project.RaveRadar.models.UserProfileLink;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
 import lombok.Getter;
-
-import java.util.Set;
 
 @Getter
 public class UserProfileEdit {
@@ -28,5 +25,5 @@ public class UserProfileEdit {
     private String avatarUrl;
 
     PersonalDetailsDTO personalDetails;
-    Set<UserProfileLink> externalLinks;
+    UserProfileLink externalLink;
 }

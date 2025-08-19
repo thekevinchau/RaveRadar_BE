@@ -2,20 +2,14 @@ package com.project.RaveRadar.controllers;
 
 import com.project.RaveRadar.DTO.EventDTO;
 import com.project.RaveRadar.DTO.UserProfileDTO;
-import com.project.RaveRadar.models.Event;
-import com.project.RaveRadar.models.User;
-import com.project.RaveRadar.models.UserProfile;
 import com.project.RaveRadar.payloads.UserProfileEdit;
-import com.project.RaveRadar.payloads.UserRegPayload;
+import com.project.RaveRadar.services.S3Service;
 import com.project.RaveRadar.services.UserProfileService;
-import com.project.RaveRadar.services.UserService;
-import com.project.RaveRadar.utils.AuthUtil;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URL;
 import java.util.Set;
 import java.util.UUID;
 
@@ -23,14 +17,13 @@ import java.util.UUID;
 @RequestMapping("/profiles")
 @AllArgsConstructor
 public class UserController {
-    private final UserService userService;
     private final UserProfileService profileService;
+    private final S3Service s3Service;
 
     @PostMapping("/links/{id}")
     public ResponseEntity<UserProfileDTO> addExternalLinks(@PathVariable UUID id, @RequestBody UserProfileEdit edits){
-        return profileService.addProfileExternalLink(id, edits.getExternalLinks());
+        return profileService.addProfileExternalLink(id, edits.getExternalLink());
     }
-
     @GetMapping("/me")
     public ResponseEntity<UserProfileDTO> getMyProfile(){
         return profileService.getMyProfile();
@@ -45,13 +38,19 @@ public class UserController {
         return profileService.getFavoriteEvents(id);
     }
 
+    @GetMapping("/upload-image-url")
+    public ResponseEntity<URL> generateAvatarUploadUrl(@RequestParam String contentType){
+        return ResponseEntity.ok(s3Service.generateProfilePictureUploadUrl(contentType));
+    }
+
     @PatchMapping("/{id}")
     public ResponseEntity<UserProfileDTO> editUserProfile(@PathVariable UUID id, @RequestBody UserProfileEdit edits){
         return profileService.editUserProfile(id, edits);
     }
-    @PatchMapping("/links/{id}")
-    public ResponseEntity<UserProfileDTO> editExternalLinks(@PathVariable UUID id, @RequestBody UserProfileEdit edits){
-        return profileService.editProfileExternalLinks(id, edits.getExternalLinks());
+    @PatchMapping("/links/{userId}")
+    public ResponseEntity<UserProfileDTO> editExternalLinks(@PathVariable UUID userId, @RequestBody UserProfileEdit edits){
+        System.out.println(userId);
+        return profileService.editProfileExternalLinks(userId, edits.getExternalLink());
     }
     @PostMapping("/favorite-events/{id}")
     public ResponseEntity<?> favoriteEvent(@PathVariable UUID id){

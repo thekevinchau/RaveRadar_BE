@@ -40,6 +40,5 @@ public class Announcement {
     private Instant createdAt;
 
     @Column(name = "updated_at")
-    @UpdateTimestamp
     private Instant updatedAt;
 }

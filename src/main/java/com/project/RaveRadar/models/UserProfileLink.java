@@ -27,7 +27,7 @@ public class UserProfileLink {
     private Platform platform;
 
     @Column(name = "external_link", columnDefinition = "TEXT")
-    private String externalLink;
+    private String link;
 
     public enum Platform {
         Spotify, Instagram, Twitter, YouTube

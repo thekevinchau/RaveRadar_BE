@@ -157,7 +157,7 @@ public class UserProfileService {
     }
 
     @Transactional
-    public ResponseEntity<UserProfileDTO> addProfileExternalLink (UUID profileId, Set<UserProfileLink> links){
+    public ResponseEntity<UserProfileDTO> addProfileExternalLink (UUID profileId, UserProfileLink link){
         Optional<UserProfile> profile = profileRepository.findById(profileId);
         if (profile.isEmpty()){
             throw new NotFoundException("User was not found!");
@@ -165,24 +165,23 @@ public class UserProfileService {
         if (!isUserProfileOwner(profile.get())){
             throw new ForbiddenException("You are not allowed to access this resource");
         }
-        if (links == null || links.isEmpty()) {
-            throw new IllegalArgumentException("No external links provided.");
+        if (link == null) {
+            throw new IllegalArgumentException("No external link provided.");
         }
-        links.forEach(link -> {
-            Optional<UserProfileLink> currentLink = profileLinkRepository.findByUserProfileAndPlatform(profile.get(), link.getPlatform());
-            if (currentLink.isPresent()){
-                throw new ResourceAlreadyExistsException(currentLink.get().getPlatform() + " is already on your profile!");
-            }
-            else {
-                link.setUserProfile(profile.get());
-            }
-        });
-        profileLinkRepository.saveAll(links);
+
+        Optional<UserProfileLink> currentLink = profileLinkRepository.findByUserProfileAndPlatform(profile.get(), link.getPlatform());
+        if (currentLink.isPresent()){
+            throw new ResourceAlreadyExistsException(currentLink.get().getPlatform() + " is already on your profile!");
+        }
+        else {
+            link.setUserProfile(profile.get());
+        }
+        profileLinkRepository.save(link);
         return getUserProfile(profileId);
     }
 
     @Transactional
-    public ResponseEntity<UserProfileDTO> editProfileExternalLinks (UUID profileId, Set<UserProfileLink> links){
+    public ResponseEntity<UserProfileDTO> editProfileExternalLinks (UUID profileId, UserProfileLink link){
         Optional<UserProfile> profile = profileRepository.findById(profileId);
         if (profile.isEmpty()){
             throw new NotFoundException("User was not found!");
@@ -190,18 +189,16 @@ public class UserProfileService {
         if (!isUserProfileOwner(profile.get())){
             throw new ForbiddenException("You are not allowed to access this resource");
         }
-        if (links == null || links.isEmpty()) {
+        if (link == null) {
             throw new IllegalArgumentException("No external links provided.");
         }
-        links.forEach(link -> {
-            UserProfileLink queriedLink = profileLinkRepository.findById(link.getId()).orElseThrow(() -> new NotFoundException("Not found"));
-            if (!queriedLink.getUserProfile().equals(profile.get())){
-                throw new ForbiddenException("This link does not belong to you to edit");
-            }
-            queriedLink.setExternalLink(link.getExternalLink());
-            queriedLink.setPlatform(link.getPlatform());
-            profileLinkRepository.save(queriedLink);
-        });
+        UserProfileLink queriedLink = profileLinkRepository.findById(link.getId()).orElseThrow(() -> new NotFoundException("Not found"));
+        if (!queriedLink.getUserProfile().equals(profile.get())){
+            throw new ForbiddenException("This link does not belong to you to edit");
+        }
+        queriedLink.setLink(link.getLink());
+        queriedLink.setPlatform(link.getPlatform());
+        profileLinkRepository.save(queriedLink);
         return getUserProfile(profileId);
     }
 

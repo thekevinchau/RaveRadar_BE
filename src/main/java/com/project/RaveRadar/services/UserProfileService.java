@@ -119,9 +119,9 @@ public class UserProfileService {
         }
     }
 
-    public ResponseEntity<Set<EventDTO>> getFavoriteEvents(UUID id){
+    public ResponseEntity<List<EventDTO>> getFavoriteEvents(UUID id){
         UserProfile profile = profileRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found."));
-        Set<EventDTO> userFavoriteEvents = profile.getFavoriteEvents().stream().map(EventDTO::new).collect(Collectors.toSet());
+        List<EventDTO> userFavoriteEvents = profile.getFavoriteEvents().stream().map(EventDTO::new).toList();
         return ResponseEntity.ok(userFavoriteEvents);
     }
 
@@ -145,7 +145,7 @@ public class UserProfileService {
             throw new ForbiddenException("You are not allowed to access this resource");
         }
         UserProfile queriedProfile = profile.get();
-        UserProfile updatedProfile = handleProfileEdits(queriedProfile, edits.getDisplayName(), edits.getGender(), edits.getBio(), edits.getAvatarUrl());
+        UserProfile updatedProfile = handleProfileEdits(queriedProfile, edits.getDisplayName(), edits.getGender(), edits.getBiography(), edits.getAvatarUrl());
         updatedProfile.setUpdatedAt(Instant.now());
         if (edits.getPersonalDetails() != null){
             String birthday = String.valueOf(edits.getPersonalDetails().getBirthday());

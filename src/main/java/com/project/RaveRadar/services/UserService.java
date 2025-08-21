@@ -9,6 +9,7 @@ import com.project.RaveRadar.models.UserProfile;
 import com.project.RaveRadar.payloads.UserRegPayload;
 import com.project.RaveRadar.repositories.UserRepository;
 import com.project.RaveRadar.security.JwtUtil;
+import com.project.RaveRadar.utils.AuthUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,9 @@ public class UserService {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private AuthUtil authUtil;
 
     private final UserRepository userRepository;
     private final UserProfileService profileService;
@@ -83,24 +87,15 @@ public class UserService {
 
         response.addHeader("Set-Cookie", cookie.toString());
         UserProfileDTO dto = profileService.getMyProfile().getBody();
-        dto.setAdmin(isUserAdmin(authentication));
+        assert dto != null;
+        dto.setAdmin(authUtil.isUserAdmin(authentication));
         return ResponseEntity.ok(dto);
     }
-    public Boolean isUserAdmin(Authentication authentication) {
-        // The principal contains the authenticated user
-        if (authentication == null){
-            throw new ForbiddenException("You are not currently logged in!");
-        }
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-
-        // Get roles as strings
-        List<String> roles = userDetails.getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
-
-        System.out.println(roles);
-        return roles.contains("ROLE_ADMIN");
+    public ResponseEntity<UserProfileDTO> getMyProfile(){
+        UserProfileDTO dto = profileService.getMyProfile().getBody();
+        assert dto != null;
+        dto.setAdmin(authUtil.isUserAdmin());
+        return ResponseEntity.ok(dto);
     }
 }

@@ -7,9 +7,12 @@ import com.project.RaveRadar.repositories.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Data
@@ -28,10 +31,30 @@ public class AuthUtil {
         }
         return userOptional.get();
     }
-    public void isUserAdmin(){
+    public boolean isUserAdmin(){
         User currentUser = getCurrentUser();
         if (!currentUser.getRole().equals("ROLE_ADMIN")){
-            throw new ForbiddenException("You are not authorized to make an announcement.");
+            return false;
         }
+        else{
+            return true;
+        }
+    }
+    public Boolean isUserAdmin(Authentication authentication) {
+        // The principal contains the authenticated user
+        if (authentication == null){
+            throw new ForbiddenException("You are not currently logged in!");
+        }
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+
+        // Get roles as strings
+        List<String> roles = userDetails.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+
+        System.out.println(roles);
+        return roles.contains("ROLE_ADMIN");
     }
 }

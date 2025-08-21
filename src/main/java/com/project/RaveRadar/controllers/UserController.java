@@ -5,11 +5,14 @@ import com.project.RaveRadar.DTO.UserProfileDTO;
 import com.project.RaveRadar.payloads.UserProfileEdit;
 import com.project.RaveRadar.services.S3Service;
 import com.project.RaveRadar.services.UserProfileService;
+import com.project.RaveRadar.services.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URL;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -18,6 +21,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class UserController {
     private final UserProfileService profileService;
+    private final UserService userService;
     private final S3Service s3Service;
 
     @PostMapping("/links/{id}")
@@ -25,8 +29,9 @@ public class UserController {
         return profileService.addProfileExternalLink(id, edits.getExternalLink());
     }
     @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserProfileDTO> getMyProfile(){
-        return profileService.getMyProfile();
+        return userService.getMyProfile();
     }
 
     @GetMapping("/{id}")
@@ -34,7 +39,7 @@ public class UserController {
         return profileService.getUserProfile(id);
     }
     @GetMapping("/favorite-events/{id}")
-    public ResponseEntity<Set<EventDTO>> getFavoriteEvents(@PathVariable UUID id){
+    public ResponseEntity<List<EventDTO>> getFavoriteEvents(@PathVariable UUID id){
         return profileService.getFavoriteEvents(id);
     }
 

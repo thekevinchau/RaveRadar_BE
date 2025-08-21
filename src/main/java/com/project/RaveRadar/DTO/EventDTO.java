@@ -26,25 +26,6 @@ public class EventDTO {
     private EventDetails details;
     private ImageURLs imageUrls;
 
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @Data
-    private static class EventDetails {
-        private String eventName;
-        private String description;
-        private EventType eventType;
-        private Instant startDate;
-        private Instant endDate;
-    }
-
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @Data
-    private static class ImageURLs{
-        private String bannerUrl;
-        private String avatarUrl;
-    }
-
 
     public EventDTO(Event event) {
         this.id = event.getId();

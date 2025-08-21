@@ -20,7 +20,7 @@ public class UserProfileEdit {
     private Gender gender;
 
     @Size(max = 1000, message = "Bio cannot exceed 1000 characters.")
-    private String bio;
+    private String biography;
 
     private String avatarUrl;
 

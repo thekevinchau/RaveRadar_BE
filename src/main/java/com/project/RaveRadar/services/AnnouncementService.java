@@ -49,7 +49,9 @@ public class AnnouncementService {
 
     @Transactional
     public ResponseEntity<AnnouncementDTO> createAnnouncement (Announcement announcement) {
-        authUtil.isUserAdmin();
+        if (!authUtil.isUserAdmin()){
+            throw new ForbiddenException("You are not allowed to edit this announcement!");
+        };
         Announcement newAnnouncement = new Announcement();
         newAnnouncement.setAnnouncer(profileService.getPrincipalProfile());
         newAnnouncement.setHeader(announcement.getHeader());
@@ -60,7 +62,9 @@ public class AnnouncementService {
 
     @Transactional
     public ResponseEntity<String> deleteAnnouncement(UUID announcementId){
-        authUtil.isUserAdmin();
+        if (!authUtil.isUserAdmin()){
+            throw new ForbiddenException("You are not allowed to edit this announcement!");
+        };
         Announcement queriedAnnouncement = announcementRepo.findById(announcementId).orElseThrow(
                 () -> new NotFoundException("Announcement to be deleted was not found.")
         );
@@ -71,7 +75,9 @@ public class AnnouncementService {
 
     @Transactional
     public ResponseEntity<AnnouncementDTO> editAnnouncement(UUID id, AnnouncementEdit edits){
-        authUtil.isUserAdmin();
+        if (!authUtil.isUserAdmin()){
+            throw new ForbiddenException("You are not allowed to edit this announcement!");
+        };
         Announcement queriedAnnouncement = announcementRepo.findById(id).orElseThrow(() -> new NotFoundException("Announcement not found."));
         if (queriedAnnouncement.getAnnouncer().getUser() != authUtil.getCurrentUser()){
             throw new ForbiddenException("This is not your announcement to edit");

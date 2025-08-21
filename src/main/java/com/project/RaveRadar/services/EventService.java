@@ -4,7 +4,7 @@ import com.project.RaveRadar.DTO.EventDTO;
 import com.project.RaveRadar.exceptions.NotFoundException;
 import com.project.RaveRadar.models.Event;
 import com.project.RaveRadar.models.UserProfile;
-import com.project.RaveRadar.payloads.EventPayload;
+import com.project.RaveRadar.payloads.EventCreationPayload;
 import com.project.RaveRadar.repositories.EventRepository;
 import com.project.RaveRadar.utils.AuthUtil;
 import jakarta.transaction.Transactional;
@@ -69,24 +69,25 @@ public class EventService {
     }
 
     @Transactional
-    public ResponseEntity<EventDTO> createEvent(EventPayload info) {
+    public ResponseEntity<EventDTO> createEvent(EventCreationPayload info) {
         Event newEvent = new Event();
 
         // Required fields
-        newEvent.setEventName(info.getEventName());
-        newEvent.setStartDate(info.getStartDate());
-        newEvent.setEventType(info.getEventType());
-        newEvent.setAddress(info.getAddress());
-        newEvent.setCity(info.getCity());
-        newEvent.setState(info.getState());
-        newEvent.setZipcode(info.getZipCode());
+        // Required fields
+        newEvent.setEventName(info.getEventDetails().getEventName());
+        newEvent.setStartDate(info.getEventDetails().getStartDate());
+        newEvent.setEventType(info.getEventDetails().getEventType());
+        newEvent.setAddress(info.getLocation().getAddress());
+        newEvent.setCity(info.getLocation().getCity());
+        newEvent.setState(info.getLocation().getState());
+        newEvent.setZipcode(info.getLocation().getZipcode());
 
         // Optional fields - cleaner null setting
-        newEvent.setDescription(emptyToNull(info.getDescription()));
-        newEvent.setAvatarUrl(emptyToNull(info.getAvatarUrl()));
-        newEvent.setBannerUrl(emptyToNull(info.getBannerUrl()));
-        newEvent.setVenueName(emptyToNull(info.getVenueName())); // 🔄 was setting event name incorrectly
-        newEvent.setEndDate(Instant.parse(emptyToNull(String.valueOf(info.getEndDate()))));
+        newEvent.setDescription(emptyToNull(info.getEventDetails().getDescription()));
+        newEvent.setAvatarUrl(emptyToNull(info.getImageURLs().getAvatarUrl()));
+        newEvent.setBannerUrl(emptyToNull(info.getImageURLs().getBannerUrl()));
+        newEvent.setVenueName(emptyToNull(info.getLocation().getVenueName())); // 🔄 was setting event name incorrectly
+        newEvent.setEndDate(Instant.parse(emptyToNull(String.valueOf(info.getEventDetails().getEndDate()))));
 
         // Save and return DTO
         Event savedEvent = eventRepository.save(newEvent);
@@ -94,24 +95,24 @@ public class EventService {
     }
 
     @Transactional
-    public ResponseEntity<EventDTO> updateEvent(UUID eventId, EventPayload info){
+    public ResponseEntity<EventDTO> updateEvent(UUID eventId, EventCreationPayload info){
         Event newEvent = getEventObj(eventId);
 
         // Required fields
-        newEvent.setEventName(info.getEventName());
-        newEvent.setStartDate(info.getStartDate());
-        newEvent.setEventType(info.getEventType());
-        newEvent.setAddress(info.getAddress());
-        newEvent.setCity(info.getCity());
-        newEvent.setState(info.getState());
-        newEvent.setZipcode(info.getZipCode());
+        newEvent.setEventName(info.getEventDetails().getEventName());
+        newEvent.setStartDate(info.getEventDetails().getStartDate());
+        newEvent.setEventType(info.getEventDetails().getEventType());
+        newEvent.setAddress(info.getLocation().getAddress());
+        newEvent.setCity(info.getLocation().getCity());
+        newEvent.setState(info.getLocation().getState());
+        newEvent.setZipcode(info.getLocation().getZipcode());
 
         // Optional fields - cleaner null setting
-        newEvent.setDescription(emptyToNull(info.getDescription()));
-        newEvent.setAvatarUrl(emptyToNull(info.getAvatarUrl()));
-        newEvent.setBannerUrl(emptyToNull(info.getBannerUrl()));
-        newEvent.setVenueName(emptyToNull(info.getVenueName())); // 🔄 was setting event name incorrectly
-        newEvent.setEndDate(Instant.parse(emptyToNull(String.valueOf(info.getEndDate()))));
+        newEvent.setDescription(emptyToNull(info.getEventDetails().getDescription()));
+        newEvent.setAvatarUrl(emptyToNull(info.getImageURLs().getAvatarUrl()));
+        newEvent.setBannerUrl(emptyToNull(info.getImageURLs().getBannerUrl()));
+        newEvent.setVenueName(emptyToNull(info.getLocation().getVenueName())); // 🔄 was setting event name incorrectly
+        newEvent.setEndDate(Instant.parse(emptyToNull(String.valueOf(info.getEventDetails().getEndDate()))));
 
         Event savedEvent = eventRepository.save(newEvent);
         return ResponseEntity.ok(new EventDTO(savedEvent));

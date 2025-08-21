@@ -1,7 +1,7 @@
 package com.project.RaveRadar.controllers;
 
 import com.project.RaveRadar.DTO.EventDTO;
-import com.project.RaveRadar.payloads.EventPayload;
+import com.project.RaveRadar.payloads.EventCreationPayload;
 import com.project.RaveRadar.services.EventService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -20,7 +20,7 @@ public class EventController {
 
     @PreAuthorize("isAuthenticated() and hasRole('ADMIN')")
     @PostMapping("")
-    public ResponseEntity<EventDTO> createEvent(@Valid @RequestBody EventPayload event){
+    public ResponseEntity<EventDTO> createEvent(@Valid @RequestBody EventCreationPayload event){
         return eventService.createEvent(event);
     }
 
@@ -45,7 +45,7 @@ public class EventController {
 
     @PreAuthorize("isAuthenticated() and hasRole('ADMIN')")
     @PatchMapping("/{id}")
-    public ResponseEntity<EventDTO> updateEvent(@PathVariable UUID id, @RequestBody EventPayload payload){
+    public ResponseEntity<EventDTO> updateEvent(@PathVariable UUID id, @RequestBody EventCreationPayload payload){
         return eventService.updateEvent(id, payload);
     }
 

@@ -1,14 +1,17 @@
 package com.project.RaveRadar.controllers;
 
 import com.project.RaveRadar.DTO.EventDTO;
+import com.project.RaveRadar.enums.ImageCategory;
 import com.project.RaveRadar.payloads.EventCreationPayload;
 import com.project.RaveRadar.services.EventService;
+import com.project.RaveRadar.services.S3Service;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URL;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,6 +20,7 @@ import java.util.UUID;
 @RequestMapping("/events")
 public class EventController {
     private final EventService eventService;
+    private final S3Service s3Service;
 
     @PreAuthorize("isAuthenticated() and hasRole('ADMIN')")
     @PostMapping("")
@@ -36,6 +40,16 @@ public class EventController {
         else{
             return eventService.getPastEvents(page, size);
         }
+    }
+
+    @GetMapping("/image-upload-url/{eventId}")
+    public ResponseEntity<URL> generatePresignedUploadUrl(
+            @RequestParam String contentType,
+            @RequestParam String imageCategory,
+            @PathVariable UUID eventId
+    ){
+        return ResponseEntity.ok(s3Service.generateEventImageUrls(eventId, imageCategory, contentType));
+
     }
 
     @GetMapping("/{id}")

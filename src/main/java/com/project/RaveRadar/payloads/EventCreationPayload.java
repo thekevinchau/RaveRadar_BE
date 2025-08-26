@@ -12,11 +12,13 @@ import lombok.*;
 
 
 import java.time.Instant;
+import java.util.UUID;
 
 
 @Getter
 public class EventCreationPayload {
 
+    private UUID id;
 
     @NotNull
     private EventDetails eventDetails;

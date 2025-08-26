@@ -74,6 +74,10 @@ public class EventService {
 
         // Required fields
         // Required fields
+        if (info.getId() != null){
+            newEvent.setId(info.getId());
+        }
+
         newEvent.setEventName(info.getEventDetails().getEventName());
         newEvent.setStartDate(info.getEventDetails().getStartDate());
         newEvent.setEventType(info.getEventDetails().getEventType());

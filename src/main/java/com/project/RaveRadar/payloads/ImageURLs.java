@@ -1,4 +1,4 @@
-package com.project.RaveRadar.DTO;
+package com.project.RaveRadar.payloads;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

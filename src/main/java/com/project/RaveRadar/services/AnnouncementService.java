@@ -2,15 +2,19 @@ package com.project.RaveRadar.services;
 
 import com.project.RaveRadar.DTO.AnnouncementDTO;
 import com.project.RaveRadar.DTO.CommentDTO;
+import com.project.RaveRadar.DTO.CommentReplyDTO;
 import com.project.RaveRadar.exceptions.ForbiddenException;
 import com.project.RaveRadar.exceptions.NotFoundException;
 import com.project.RaveRadar.models.Announcement;
 import com.project.RaveRadar.models.AnnouncementComment;
+import com.project.RaveRadar.models.AnnouncementCommentReply;
 import com.project.RaveRadar.payloads.AnnouncementEdit;
+import com.project.RaveRadar.payloads.CommentReplyPayload;
 import com.project.RaveRadar.repositories.AnnouncementCommentRepo;
 import com.project.RaveRadar.repositories.AnnouncementRepo;
 import com.project.RaveRadar.utils.AuthUtil;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.data.domain.Page;
@@ -97,6 +101,7 @@ public class AnnouncementService {
     @AllArgsConstructor
     @Data
     public static class CommentPayload{
+        @NotBlank
         private String content;
     }
 
@@ -108,6 +113,26 @@ public class AnnouncementService {
         comment.setContent(payload.getContent());
         comment.setCreatedAt(Instant.now());
         return ResponseEntity.status(HttpStatus.CREATED).body(new CommentDTO(commentRepo.save(comment)));
+    }
+
+    /*
+    - Retrieve the user that is logged in (who called this service function)
+    - Create the reply object
+    - Set the reply object's commenter to the user that is logged in
+    - Set the reply object's comment to be the payload comment
+    - Set the createdAt to now.
+     */
+    @Transactional
+    public ResponseEntity<CommentReplyDTO> commentReply(UUID commentId, CommentReplyPayload payload){
+        AnnouncementCommentReply reply = AnnouncementCommentReply
+                .builder()
+                .comment(commentRepo.findById(commentId).orElseThrow(() -> new NotFoundException("Comment being replied to was not found!")))
+                .commenter(profileService.getPrincipalProfile())
+                .content(payload.getComment())
+                .createdAt(Instant.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(new CommentReplyDTO(reply));
+
     }
 
     @Transactional

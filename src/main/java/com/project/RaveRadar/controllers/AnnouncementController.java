@@ -3,8 +3,8 @@ package com.project.RaveRadar.controllers;
 import com.project.RaveRadar.DTO.AnnouncementDTO;
 import com.project.RaveRadar.DTO.CommentDTO;
 import com.project.RaveRadar.models.Announcement;
-import com.project.RaveRadar.models.AnnouncementComment;
 import com.project.RaveRadar.payloads.AnnouncementEdit;
+import com.project.RaveRadar.payloads.CommentReplyPayload;
 import com.project.RaveRadar.services.AnnouncementService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -35,6 +35,11 @@ public class AnnouncementController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<CommentDTO> commentOnAnnouncement(@PathVariable UUID id, @RequestBody AnnouncementService.CommentPayload payload){
         return announcementService.createComment(id, payload);
+    }
+
+    @PostMapping("/{commentId}")
+    public ResponseEntity<?> replyToComment(@PathVariable UUID commentId, @RequestBody CommentReplyPayload payload){
+        return announcementService.commentReply(commentId, payload);
     }
 
 

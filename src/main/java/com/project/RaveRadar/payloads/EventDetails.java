@@ -1,4 +1,4 @@
-package com.project.RaveRadar.DTO;
+package com.project.RaveRadar.payloads;
 
 import com.project.RaveRadar.enums.EventType;
 import lombok.AllArgsConstructor;

@@ -1,6 +1,7 @@
 package com.project.RaveRadar.DTO;
 
 import com.project.RaveRadar.models.AnnouncementComment;
+import com.project.RaveRadar.models.AnnouncementCommentReply;
 import lombok.Data;
 
 import java.time.Instant;

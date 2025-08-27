@@ -8,10 +8,12 @@ import com.project.RaveRadar.exceptions.NotFoundException;
 import com.project.RaveRadar.models.Announcement;
 import com.project.RaveRadar.models.AnnouncementComment;
 import com.project.RaveRadar.models.AnnouncementCommentReply;
+import com.project.RaveRadar.models.UserProfile;
 import com.project.RaveRadar.payloads.AnnouncementEdit;
 import com.project.RaveRadar.payloads.CommentReplyPayload;
 import com.project.RaveRadar.repositories.AnnouncementCommentRepo;
 import com.project.RaveRadar.repositories.AnnouncementRepo;
+import com.project.RaveRadar.repositories.CommentReplyRepo;
 import com.project.RaveRadar.utils.AuthUtil;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
@@ -32,6 +34,7 @@ import java.util.UUID;
 public class AnnouncementService {
     private final AnnouncementRepo announcementRepo;
     private final AnnouncementCommentRepo commentRepo;
+    private final CommentReplyRepo commentReplyRepo;
     private final UserProfileService profileService;
     private final AuthUtil authUtil;
 
@@ -123,16 +126,30 @@ public class AnnouncementService {
     - Set the createdAt to now.
      */
     @Transactional
-    public ResponseEntity<CommentReplyDTO> commentReply(UUID commentId, CommentReplyPayload payload){
+    public ResponseEntity<CommentReplyDTO> replyToComment(UUID commentId, CommentReplyPayload payload){
         AnnouncementCommentReply reply = AnnouncementCommentReply
                 .builder()
                 .comment(commentRepo.findById(commentId).orElseThrow(() -> new NotFoundException("Comment being replied to was not found!")))
                 .commenter(profileService.getPrincipalProfile())
-                .content(payload.getComment())
+                .content(payload.getContent())
                 .createdAt(Instant.now())
                 .build();
+        commentReplyRepo.save(reply);
         return ResponseEntity.status(HttpStatus.CREATED).body(new CommentReplyDTO(reply));
 
+    }
+
+    @Transactional
+    public ResponseEntity<?> deleteReply (UUID commentId){
+        AnnouncementCommentReply reply = commentReplyRepo.findById(commentId).orElseThrow(() -> new NotFoundException("The reply you are trying to delete does not exist!"));
+        UserProfile principal = profileService.getPrincipalProfile();
+        if (!principal.getId().equals(reply.getCommenter().getId())){
+            throw new ForbiddenException("You are not allowed to delete this reply!");
+        }
+        else{
+            commentReplyRepo.delete(reply);
+        }
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Transactional

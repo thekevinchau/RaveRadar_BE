@@ -37,9 +37,17 @@ public class AnnouncementController {
         return announcementService.createComment(id, payload);
     }
 
-    @PostMapping("/{commentId}")
+    @PostMapping("/replies/{commentId}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> replyToComment(@PathVariable UUID commentId, @RequestBody CommentReplyPayload payload){
-        return announcementService.commentReply(commentId, payload);
+        System.out.println(payload.getContent());
+        return announcementService.replyToComment(commentId, payload);
+    }
+
+    @DeleteMapping("/replies/{commentId}")
+    @PreAuthorize(("isAuthenticated()"))
+    public ResponseEntity<?> deleteReply(@PathVariable UUID commentId){
+        return announcementService.deleteReply(commentId);
     }
 
 

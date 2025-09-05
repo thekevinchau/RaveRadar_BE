@@ -136,7 +136,11 @@ public class AnnouncementService {
                 .build();
         commentReplyRepo.save(reply);
         return ResponseEntity.status(HttpStatus.CREATED).body(new CommentReplyDTO(reply));
-
+    }
+    
+    public List<CommentReplyDTO> getRepliesByCommentId(UUID commentId){
+        List<AnnouncementCommentReply> replies = commentReplyRepo.getAllRepliesByCommentId(commentId);
+        return replies.stream().map(CommentReplyDTO::new).toList();
     }
 
     @Transactional

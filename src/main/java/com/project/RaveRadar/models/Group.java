@@ -2,6 +2,7 @@ package com.project.RaveRadar.models;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
@@ -14,6 +15,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "groups")
+@Builder
 public class Group {
 
     @Id
@@ -29,10 +31,15 @@ public class Group {
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    @OneToOne
-    @JoinColumn(name = "event_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "event_id", nullable = false)
     private Event event;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
+
+    @ManyToOne // usually Many groups can be created by one user
+    @JoinColumn(name = "created_by")
+    private UserProfile createdBy;
+
 }

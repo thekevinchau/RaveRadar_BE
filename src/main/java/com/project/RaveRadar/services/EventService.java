@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
@@ -95,7 +96,8 @@ public class EventService {
 
         // Save and return DTO
         Event savedEvent = eventRepository.save(newEvent);
-        return ResponseEntity.ok(new EventDTO(savedEvent));
+        URI location = URI.create("/events/" + savedEvent.getId());
+        return ResponseEntity.created(location).body(new EventDTO(savedEvent));
     }
 
     @Transactional

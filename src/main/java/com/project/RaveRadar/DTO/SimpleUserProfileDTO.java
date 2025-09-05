@@ -14,4 +14,10 @@ public class SimpleUserProfileDTO {
     private UUID id;
     private String name;
     private String avatarUrl;
+
+    public SimpleUserProfileDTO(UserProfile userProfile){
+        this.id = userProfile.getId();
+        this.name = userProfile.getDisplayName();
+        this.avatarUrl = userProfile.getAvatarUrl();
+    }
 }
